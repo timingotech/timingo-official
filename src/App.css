@@ -6,7 +6,16 @@
     -webkit-background-clip: text; 
     background-clip: text; 
     color: #fafafa;
-    background: linear-gradient(225deg, #6675F7 0%, #57007B 100%);
+    background: linear-gradient(225deg, #F7666F 0%, #6675F7 100%);
+  }
+  .nav-text-gradient {
+    padding: 2px 7px 6px 7px;
+    border-radius: 5px;
+    display: inline; 
+    -webkit-background-clip: text; 
+    background-clip: text; 
+    color: #fafafa;
+    background: linear-gradient(225deg, #F7666F 0%, #6675F7 100%);
   }
   .support-gradient {
     padding: 8px 7px 8px 7px;
@@ -15,7 +24,7 @@
     -webkit-background-clip: text; 
     background-clip: text; 
     color: #fafafa;
-    background: linear-gradient(225deg, #6675F7 0%, #57007B 100%);
+    background: linear-gradient(225deg, #F7666F 0%, #6675F7 100%);
     margin-left: -5px;
   }
   .hometext-gradient {
@@ -24,19 +33,19 @@
     background-clip: text;
     color: transparent;
   }
-  /* Define animations */
+   /* Define animations */
 .animate-on-scroll {
   opacity: 0;
-  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+  transition: opacity 1s ease-out, transform 1s ease-out;
   transform: translateX(0);
 }
 
 .left-to-right {
-  transform: translateX(-100%);
+  transform: translateX(-0);
 }
 
 .right-to-left {
-  transform: translateX(100%);
+  transform: translateX(0);
 }
 
 /* Show element when scrolled into view */
@@ -50,17 +59,20 @@
   opacity: 0;
   transition: opacity 0.8s ease-out, transform 0.8s ease-out;
 }
+.titleproject{
+  display: none;
+}
 
 /* Left-to-right animation */
 .animate-left.show {
   opacity: 1;
-  transform: translateX(0); /* Target position for left-to-right */
+  transform: translateX(0.9%); /* Target position for left-to-right */
 }
 
 /* Right-to-left animation */
 .animate-right.show {
   opacity: 1;
-  transform: translateX(0); /* Target position for right-to-left */
+  transform: translateX(0.9%); /* Target position for right-to-left */
 }
 
 /* Initial positions */
@@ -74,3 +86,131 @@
 /* .backpic{
   background-image: url(/timingotech/src/images/Glasstech.avif);
 } */
+.nav1{
+  display: none;
+}
+@media (max-width: 700px) {
+  .closebutton{
+    margin-top: -100px;
+  }
+  .titleproject{
+    display: inline-block;
+    text-align: center;
+    margin-left: 95px;
+  }
+  .titleproject2{
+    display: inline-block;
+    text-align: center;
+    margin-left: 130px;
+  }
+  .titleproject3{
+    display: inline-block;
+    text-align: center;
+    margin-left: 125px;
+  }
+  .titleshowlarge{
+    display: none;
+  }
+  .name{
+    margin-left: -33px;
+  }
+  .navone{
+    margin-left: -10px;
+    margin-top: 50px;
+    font-size: 20px;
+  }
+  .navtotal{
+    display: none;
+  }
+  .navfirst{
+    margin-bottom: 30px;
+    margin-left: 8px;
+  }
+  .anima{
+    margin-left: 10px;
+  }
+  .anima img{
+    margin-left:20px ;
+    width: 85%;
+    height: 75%;
+  }
+  .smalldevices{
+    display: inline;
+  }
+  .largescreen{
+    display:none ;
+  }
+  .textproject{
+    width: 300px;
+  }
+}
+
+
+.marquee-container {
+  overflow: hidden;
+}
+
+.marquee {
+  display: flex;
+  animation: marquee-animation 10s linear infinite;
+}
+
+.marquee img {
+  flex-shrink: 0;
+  /* margin-right: 20px; */
+}
+
+@keyframes marquee-animation {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+/* Navbar.css */
+
+/* Navbar.css */
+
+/* Initially hide the nav menu */
+.nav-menu {
+  display: none;
+  transition: all 0.3s ease;
+  animation-duration: 0.3s;
+  animation-fill-mode: both;
+}
+
+/* Show the nav menu when the 'showMenu' state is true */
+.nav-menu.active {
+  display: block;
+  animation-name: slideDown;
+}
+
+/* Hide the nav menu when 'showMenu' state is false */
+.nav-menu.inactive {
+  animation-name: slideUp;
+}
+
+/* Define the slide-down animation */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Define the slide-up animation */
+@keyframes slideUp {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+}

@@ -1,6 +1,7 @@
 import React from 'react'
 import Alfa from '../images/Alfa.JPG'
 import Line from '../images/Line.png'
+import LinkedInLogo from '../images/LinkedInLogo.png'; 
 import { useEffect,useState } from 'react'
 
 
@@ -32,18 +33,22 @@ const About = () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
-  
+
   return (
     <div className="container mx-auto">
-      <h1 className="p-8 mb-6 text-4xl font-bold text-center mt--5 hometext-gradient">About Timingotech</h1>
+      <h1 className="p-8 text-4xl font-bold text-center mb-[-20px] mt-[-20px] hometext-gradient">About Timingotech</h1>
 
-      <div className="flex flex-col items-center px-32 mb-8 md:flex-row" >
+      <div className="flex flex-col items-center px-5 mb-8 md:px-16 md:flex-row" >
         <div className= {`animate-left ${animateOnLoad ? 'show' : ''} mb-4 md:w-1/2`}>
-          <img src={Alfa} alt="Founder" className="w-[300px] h-[400px] rounded-lg shadow-md" />
+          <img src={Alfa} alt="Founder" className="md:w-[400px] md:h-[500px] rounded-lg shadow-md" />
         </div>
 
         <div className= {`animate-right ${animateOnLoad ? 'show' : ''} md:w-1/2 md:pl-8`}>
-          <h2 className="mb-4 text-2xl font-semibold">Meet <span className='hometext-gradient'>Ridwan Oyenuga</span> ,  Founder & CEO</h2>
+          <h2 className="mb-4 text-2xl font-semibold">Meet <span className='hometext-gradient'>Ridwan Oyenuga</span> ,  Founder & CEO {' '}
+          <a href="https://www.linkedin.com/in/ridwanoyenuga/" target="_blank" rel="noopener noreferrer">
+              <img src={LinkedInLogo} alt="LinkedIn" className="w-[22px] h-[22px] inline-block mt-[-6px]" />
+            </a>
+          </h2>
           <p className="mb-4">
           Ridwan Oyenuga, an innovator and tech enthusiast, founded Timingotech with a vision to utilize
             technology and AI to address global challenges. His journey started from humble beginnings, driven
@@ -52,10 +57,11 @@ const About = () => {
           <p className="mb-4">
           Ridwan's relentless pursuit of technological solutions led to the establishment of Timingotech, a
             company committed to revolutionizing industries through cutting-edge AI applications.
+            
           </p>
         </div>
       </div>
-      <div className='bg-[#F7F7FA] px-4 py-5'>
+      <div className='bg-[#eaeaec] px-4 py-5'>
       <div className="mb-8">
       <div className="flex justify-center deco-line">
         <img src={Line} alt="" className='w-[70px] h-[5px] mt-8' />
