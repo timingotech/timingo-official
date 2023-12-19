@@ -6,7 +6,7 @@ import HomeoneImage from '../images/HomeoneImage.png';
 import Line from '../images/Line.png'
 import Addidas from '../images/Addidas.png'
 import Nike from '../images/Nike.png'
-import Cowbell from '../images/Cowbell.png'
+import Microsoft from '../images/Microsoft.jpeg'
 import Ibm from '../images/Ibm.png'
 import Google from '../images/Google.png'
 import Ngo from '../images/Ngo.png'
@@ -77,7 +77,7 @@ const Home = () => {
     <>
     <main className='pb-10 md:flex '>
       <div className={`animate-left ${animateOnLoad ? 'show' : ''} md:mt-[100px] mt-[25px] md:ml-[60px] mx-6`}>
-        <h1 className='text-4xl'>Embracing the <span className='font-bold hometext-gradient'>World's </span> Challenges, <br />Leading with <span className='font-bold'> Technology</span> and <span className='font-bold hometext-gradient'>AI </span></h1>
+        <h1 className='text-4xl home-text'>Embracing the <span className='font-bold hometext-gradient'>World's </span> Challenges, <br />Leading with <span className='font-bold'> Technology</span> and <span className='font-bold hometext-gradient'>AI </span></h1>
         <p className='md:first-letter:w-[500px] mt-8'>We innovate with precision timing and AI to solve global challenges across industries.</p>
         <Link to='services'>
         <button className='px-3 py-1 mt-8 rounded-md text-gradient text-gray-50'>Explore Our Projects</button>
@@ -160,7 +160,7 @@ const Home = () => {
       <img src={Hp} alt="" className='w-48 mr-4' />
       <img src={Ibm} alt="" className='w-48 mr-4' />
       <img src={Google} alt="" className='w-48 mr-4' />
-      <img src={Cowbell} alt="" className='w-48 mr-4' />
+      <img src={Microsoft} alt="" className='w-48 mr-4' />
       <img src={Ngo} alt="" className='w-48 mr-4' />
       <img src={Nestle} alt="" className='w-48 mr-4' />
       <img src={Nike} alt="" className='w-48 mr-4' />
