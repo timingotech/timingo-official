@@ -90,6 +90,9 @@
   display: none;
 }
 @media (max-width: 700px) {
+  .home-text{
+    font-size: 23px;
+  }
   .closebutton{
     margin-top: -100px;
   }
@@ -142,6 +145,12 @@
   }
   .textproject{
     width: 300px;
+  }
+  .marquee img{
+    width: 110px;
+  }
+  .text-gradient{
+    border-radius: 15px;
   }
 }
 
