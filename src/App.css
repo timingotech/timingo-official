@@ -77,11 +77,11 @@
 
 /* Initial positions */
 .animate-left {
-  transform: translateX(-100%); /* Initial position for left-to-right */
+  transform: translateX(0.9%); /* Initial position for left-to-right */
 }
 
 .animate-right {
-  transform: translateX(100%); /* Initial position for right-to-left */
+  transform: translateX(0.9%); /* Initial position for right-to-left */
 }
 /* .backpic{
   background-image: url(/timingotech/src/images/Glasstech.avif);
