@@ -39,7 +39,7 @@ const Footer = () => {
         </a> <br />
       </div>
     </div>
-    <p className='mt-8 text-center'>&copy; 2023 Timingotech. All Rights Reserved.</p>
+    <p className='mt-8 text-center'>&copy; 2024 Timingotech. All Rights Reserved.</p>
   </div>
   
   )
