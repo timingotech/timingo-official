@@ -151,7 +151,7 @@ const Home = () => {
     <img src={Line} alt="" className='w-[70px] h-[5px] mt-8' />
   </div> 
   <div className="mb-8 texthome">
-    <h1 className='mt-4 text-2xl text-center'>Our Trusted <span className='font-bold'>Partnerships</span></h1>
+    <h1 className='mt-4 text-2xl text-center'>Our Potential <span className='font-bold'>Partners</span></h1>
   </div>
   <div className="marquee-container">
     <div className="marquee">
