@@ -79,7 +79,7 @@ const Home = () => {
       <div className={`animate-left ${animateOnLoad ? 'show' : ''} md:mt-[100px] mt-[25px] md:ml-[60px] mx-6`}>
         <h1 className='text-4xl home-text'>Embracing the <span className='font-bold hometext-gradient'>World's </span> Challenges, <br />Leading with <span className='font-bold'> Technology</span> and <span className='font-bold hometext-gradient'>AI </span></h1>
         <p className='md:first-letter:w-[500px] mt-8'>We innovate with precision timing and AI to solve global challenges across industries.</p>
-        <Link to='services'>
+        <Link to='projects'>
         <button className='px-3 py-1 mt-8 rounded-md text-gradient text-gray-50'>Explore Our Projects</button>
 
         </Link>

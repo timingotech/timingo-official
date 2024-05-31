@@ -31,7 +31,7 @@ const Navbar = () => {
             </Link>
           </li>
           <li className='block sm:inline-block navfirst'>
-            <Link to='/services' className='mr-4' onClick={closeMenu}>
+            <Link to='/projects' className='mr-4' onClick={closeMenu}>
               Projects
             </Link>
           </li>
@@ -67,7 +67,7 @@ const Navbar = () => {
             </Link>
           </li>
           <li className='block sm:inline-block'>
-            <Link to='/services' className='mr-4' onClick={closeMenu}>
+            <Link to='/projects' className='mr-4' onClick={closeMenu}>
               Projects
             </Link>
           </li>

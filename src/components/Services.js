@@ -64,7 +64,7 @@ const Services = () => {
             </li>
           </ul>
         </p>
-        <a href="https://vitaskr-website.com" target="_blank" rel="noopener noreferrer" className="text-gradient">
+        <a href="https://serenimind.onrender.com" target="_blank" rel="noopener noreferrer" className="text-gradient">
           Visit SereniMind's Official Website
         </a>
       </div>
