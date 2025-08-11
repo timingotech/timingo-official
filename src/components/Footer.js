@@ -186,10 +186,7 @@ const Footer = () => {
               <a href="#" className="w-10 h-10 bg-gray-800 hover:bg-pink-600 rounded-lg flex items-center justify-center transition-all duration-300 transform hover:scale-110 group">
                 <Instagram className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
               </a>
-              
-              <a href="#" className="w-10 h-10 bg-gray-800 hover:bg-gray-600 rounded-lg flex items-center justify-center transition-all duration-300 transform hover:scale-110 group">
-                <Github className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
-              </a>
+            
               
               <a href="#" className="w-10 h-10 bg-gray-800 hover:bg-blue-700 rounded-lg flex items-center justify-center transition-all duration-300 transform hover:scale-110 group">
                 <Facebook className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
