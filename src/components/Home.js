@@ -178,7 +178,7 @@ const Home = () => {
         <div className="relative z-10 mx-auto max-w-7xl">
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <div className={`animate-left ${animateOnLoad ? 'show' : ''}`}>
-              <h1 className="mb-6 text-5xl font-bold leading-tight text-white lg:text-6xl">
+              <h1 className="mb-6 text-4xl font-bold leading-tight text-white lg:text-6xl">
                 Embracing the <span className="gradient-text">World's</span> Challenges,
                 <br />Leading with <span className="gradient-text">Technology</span> and <span className="gradient-text">AI</span>
               </h1>
