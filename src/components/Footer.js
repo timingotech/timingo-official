@@ -108,7 +108,7 @@ const Footer = () => {
                 </div>
                 <div>
                   <div className="text-sm text-gray-400">Address</div>
-                  <div className="text-white">123 Tech Street, Innovation City</div>
+                  <div className="text-white">Lagos, Nigeria</div>
                 </div>
               </div>
             </div>
