@@ -535,9 +535,8 @@ const Home = () => {
           <div className="partners-grid">
             {partners.map((partner, index) => (
             <div key={index} className="animate-on-scroll">
-              <div className="bg-white rounded-lg p-6 text-center border border-white/20 hover:bg-[#c7c5c5] transition-all duration-300">
-                <img src={partner.logo} alt={partner.name} className="mx-auto h-16 object-contain mb-3" />
-                <div className="text-black font-semibold">{partner.name}</div>
+              <div className="bg-white rounded-lg p-1 text-center border border-white/20 hover:bg-[#c7c5c5] transition-all duration-300">
+                <img src={partner.logo} alt={partner.name} className="mx-auto h-24 object-contain" />
               </div>
             </div>
           ))}
