@@ -1,9 +1,14 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { ChevronRight, Users, Trophy, Lightbulb, Zap, Shield, Globe, ArrowRight, CheckCircle, Star, TrendingUp, Code, Smartphone, Cloud, Database, Brain, Rocket, Target, Award } from 'lucide-react';
+import { ChevronRight, Users, Trophy, Lightbulb, Zap, Shield, Globe, ArrowRight, CheckCircle, Star, TrendingUp, Code, Smartphone, Cloud, Database, Brain, Rocket, Target, Award, X, ExternalLink } from 'lucide-react';
+import {Link} from 'react-router-dom'
+import Microsoft from '../images/Microsoft.jpeg'
+import SereniMind from '../images/SereniMind.png'
+import Trof from '../images/Trof.png'
 
 const Home = () => {
   const [animateOnLoad, setAnimateOnLoad] = useState(false);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [selectedProject, setSelectedProject] = useState(null);
   const form = useRef();
 
   useEffect(() => {
@@ -50,14 +55,9 @@ const Home = () => {
   };
 
   const partners = [
-    { name: 'Nike', logo: '🏃' },
-    { name: 'Adidas', logo: '👟' },
-    { name: 'HP', logo: '💻' },
-    { name: 'IBM', logo: '🏢' },
-    { name: 'Google', logo: '🔍' },
-    { name: 'Microsoft', logo: '🪟' },
-    { name: 'Meta', logo: '📘' },
-    { name: 'Apple', logo: '🍎' }
+    { name: 'SereniMind', logo: SereniMind },
+    { name: 'TROF', logo: Trof },
+    { name: 'Microsoft', logo: Microsoft }
   ];
 
   const services = [
@@ -71,35 +71,69 @@ const Home = () => {
 
   const projects = [
     {
-      title: 'MediaFlow AI Platform',
-      category: 'Media Organization',
+      title: 'SereniMind',
+      category: 'Mental Health Tech Startup',
       achievement: '300,000+ Users',
-      description: 'AI-powered content management system for news organizations',
-      metrics: ['50% faster content processing', '99.9% uptime', 'Real-time analytics'],
-      tech: ['React', 'Node.js', 'TensorFlow', 'AWS']
+      description: 'AI-powered mental health platform providing therapy, community support, and wellness tools',
+      metrics: ['Over 10+ African & global partnerships', '99.9% uptime', 'Top 100 Health Companies in Nigeria'],
+      tech: ['React', 'Django REST', 'TensorFlow', 'AWS'],
+      website: 'https://serenimind.com.ng',
+      fullDescription: 'SereniMind is a revolutionary mental health platform that combines AI technology with human expertise to provide accessible mental health care across Africa. The platform offers personalized therapy sessions, community support groups, wellness tracking, and crisis intervention services.',
+      features: [
+        'AI-powered mental health assessments',
+        'Video therapy sessions with licensed professionals',
+        'Community support forums and group therapy',
+        'Wellness tracking and mood monitoring',
+        '24/7 crisis intervention hotline',
+        'Multilingual support for African languages'
+      ]
     },
     {
       title: 'FinTech Mobile App',
       category: 'Financial Technology',
       achievement: '$2M+ Transactions',
       description: 'Secure mobile banking solution with biometric authentication',
-      metrics: ['500K+ downloads', 'Bank-grade security', '4.8/5 rating'],
-      tech: ['React Native', 'Blockchain', 'AWS Lambda']
+      metrics: ['5K+ downloads', 'Bank-grade security', '4.8/5 rating'],
+      tech: ['React Native', 'Blockchain', 'AWS Lambda'],
+      website: '',
+      fullDescription: 'A cutting-edge mobile banking application that revolutionizes financial transactions with advanced security features and seamless user experience. Built with blockchain technology for enhanced security and transparency.',
+      features: [
+        'Biometric authentication (fingerprint & face recognition)',
+        'Real-time transaction monitoring',
+        'Blockchain-based security',
+        'Multi-currency support',
+        'Investment portfolio management',
+        'AI-powered spending insights'
+      ]
     },
     {
-      title: 'Smart City IoT Network',
-      category: 'IoT & Smart Systems',
-      achievement: '50+ Cities',
-      description: 'Comprehensive IoT infrastructure for urban management',
-      metrics: ['30% energy savings', '1M+ sensors', 'Real-time monitoring'],
-      tech: ['IoT', 'Machine Learning', 'Azure', 'Python']
+      title: 'Raymond Ofodu Foundation (TROF)',
+      category: 'Nonprofit & Community Development',
+      achievement: '1,000+ Children Supported',
+      description: 'A pan-African charity dedicated to child protection, education, youth empowerment, and climate action.',
+      metrics: [
+        '1,000+ children supported',
+        '25+ communities reached',
+        '500+ testimonials from grateful families'
+      ],
+      tech: ['React', 'Node JS', 'Vercel'],
+      website: 'https://trof.vercel.app',
+      fullDescription: 'The Raymond Ofodu Foundation is a comprehensive nonprofit platform that manages charitable activities across Africa, focusing on child welfare, education, and environmental sustainability. The platform streamlines donation management, volunteer coordination, and impact tracking.',
+      features: [
+        'Donation management system',
+        'Volunteer registration and coordination',
+        'Impact tracking and reporting',
+        'Educational resource distribution',
+        'Community outreach programs',
+        'Climate action initiatives tracking'
+      ]
     }
   ];
 
   const testimonials = [
     {
-      name: 'Sarah Johnson',
-      company: 'TechCorp Inc.',
+      name: 'Adebola Adeniyi',
+      company: 'SereniMind',
       role: 'CTO',
       content: 'TimingoTech transformed our digital infrastructure. Their AI solutions increased our efficiency by 40%.',
       rating: 5
@@ -112,13 +146,40 @@ const Home = () => {
       rating: 5
     },
     {
-      name: 'Emily Rodriguez',
+      name: 'David Chibu',
       company: 'FinanceFlow',
       role: 'Product Director',
       content: 'Outstanding mobile development. Our app now serves millions with perfect reliability.',
       rating: 5
     }
   ];
+
+  const openProjectModal = (project) => {
+    setSelectedProject(project);
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+  };
+
+  const closeProjectModal = () => {
+    setSelectedProject(null);
+    document.body.style.overflow = 'unset'; // Restore scrolling
+  };
+
+  // Close modal on escape key press
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') {
+        closeProjectModal();
+      }
+    };
+
+    if (selectedProject) {
+      document.addEventListener('keydown', handleEscape);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [selectedProject]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
@@ -170,6 +231,14 @@ const Home = () => {
           align-items: center;
           justify-items: center;
         }
+        .modal-backdrop {
+          backdrop-filter: blur(8px);
+          background-color: rgba(0, 0, 0, 0.8);
+        }
+        .modal-content {
+          max-height: 90vh;
+          overflow-y: auto;
+        }
       `}</style>
 
       {/* Hero Section */}
@@ -187,12 +256,12 @@ const Home = () => {
                 delivering cutting-edge solutions that transform businesses and drive digital evolution.
               </p>
               <div className="flex flex-wrap gap-4">
-                <button className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 flex items-center gap-2">
+                <Link to='/projects' className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 flex items-center gap-2">
                   Explore Our Projects <ChevronRight className="w-5 h-5" />
-                </button>
-                <button className="px-8 py-4 border-2 border-white/30 text-white rounded-lg font-semibold hover:bg-white/10 transition-all duration-300">
+                </Link>
+                <Link to='/contact' className="px-8 py-4 border-2 border-white/30 text-white rounded-lg font-semibold hover:bg-white/10 transition-all duration-300">
                   Get Started
-                </button>
+                </Link>
               </div>
             </div>
             <div className={`animate-right ${animateOnLoad ? 'show' : ''}`}>
@@ -239,9 +308,12 @@ const Home = () => {
                 <div className="text-blue-600 mb-4">{service.icon}</div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">{service.title}</h3>
                 <p className="text-gray-600 mb-4">{service.desc}</p>
-                <button className="text-blue-600 font-semibold flex items-center gap-2 hover:gap-3 transition-all">
+                <Link 
+                  to="/services" 
+                  className="text-blue-600 font-semibold flex items-center gap-2 hover:gap-3 transition-all"
+                >
                   Learn More <ArrowRight className="w-4 h-4" />
-                </button>
+                </Link>
               </div>
             ))}
           </div>
@@ -287,7 +359,10 @@ const Home = () => {
                     ))}
                   </div>
                   
-                  <button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all">
+                  <button 
+                    onClick={() => openProjectModal(project)}
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all"
+                  >
                     View Case Study
                   </button>
                 </div>
@@ -296,6 +371,88 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      {/* Project Modal */}
+      {selectedProject && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+          <div className="relative bg-white rounded-2xl shadow-2xl max-w-4xl w-full modal-content">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h2 className="text-2xl font-bold text-gray-900">{selectedProject.title}</h2>
+              <button 
+                onClick={closeProjectModal}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <X className="w-6 h-6 text-gray-600" />
+              </button>
+            </div>
+            
+            <div className="p-6 space-y-6">
+              <div className="flex items-center gap-3">
+                <Trophy className="w-6 h-6 text-yellow-500" />
+                <span className="text-yellow-600 font-semibold">{selectedProject.achievement}</span>
+              </div>
+              
+              <div>
+                <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full mb-4">
+                  {selectedProject.category}
+                </span>
+                <p className="text-gray-700 text-lg leading-relaxed">{selectedProject.fullDescription}</p>
+              </div>
+
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">Key Features</h3>
+                <div className="grid md:grid-cols-2 gap-3">
+                  {selectedProject.features.map((feature, index) => (
+                    <div key={index} className="flex items-start gap-2">
+                      <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-gray-600">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">Key Achievements</h3>
+                <div className="grid md:grid-cols-3 gap-4">
+                  {selectedProject.metrics.map((metric, index) => (
+                    <div key={index} className="bg-blue-50 p-4 rounded-lg text-center">
+                      <div className="text-blue-600 font-semibold">{metric}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">Technologies Used</h3>
+                <div className="flex flex-wrap gap-2">
+                  {selectedProject.tech.map((tech, index) => (
+                    <span key={index} className="px-4 py-2 bg-gray-100 text-gray-800 rounded-full font-medium">
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
+                <a
+                  href={selectedProject.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 flex items-center justify-center gap-2"
+                >
+                  Visit Website <ExternalLink className="w-5 h-5" />
+                </a>
+                <button
+                  onClick={closeProjectModal}
+                  className="flex-1 border-2 border-gray-300 text-gray-700 py-3 px-6 rounded-lg font-semibold hover:bg-gray-50 transition-all duration-300"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Development Approach */}
       <section className="py-20 bg-white">
@@ -377,13 +534,13 @@ const Home = () => {
           </div>
           <div className="partners-grid">
             {partners.map((partner, index) => (
-              <div key={index} className="animate-on-scroll">
-                <div className="bg-white/10 backdrop-blur-lg rounded-lg p-6 text-center border border-white/20 hover:bg-white/20 transition-all duration-300">
-                  <div className="text-4xl mb-3">{partner.logo}</div>
-                  <div className="text-white font-semibold">{partner.name}</div>
-                </div>
+            <div key={index} className="animate-on-scroll">
+              <div className="bg-white rounded-lg p-6 text-center border border-white/20 hover:bg-[#c7c5c5] transition-all duration-300">
+                <img src={partner.logo} alt={partner.name} className="mx-auto h-16 object-contain mb-3" />
+                <div className="text-black font-semibold">{partner.name}</div>
               </div>
-            ))}
+            </div>
+          ))}
           </div>
         </div>
       </section>
@@ -505,29 +662,17 @@ const Home = () => {
               <div className="animate-on-scroll bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20">
                 <h3 className="text-2xl font-bold text-white mb-6">Contact Information</h3>
                 <div className="space-y-4 text-gray-300">
-                  <div>📧 hello@timingotech.com</div>
-                  <div>📞 +1 (555) 123-4567</div>
-                  <div>📍 123 Tech Street, Innovation City, IC 12345</div>
-                  <div>🕒 Mon-Fri: 9:00 AM - 6:00 PM</div>
+                  <div>📧 timingotech@gmail.com</div>
+                  <div>📞 +234 (902) 201-3174</div>
+                  <div>📍 Lagos, Nigeria</div>
+                  <div>🕒 Mon-Sat: 9:00 AM - 6:00 PM</div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="py-12 bg-black text-white">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="text-center">
-            <h3 className="text-2xl font-bold gradient-text mb-4">TimingoTech</h3>
-            <p className="text-gray-400 mb-6">Embracing tomorrow's challenges with today's technology</p>
-            <div className="text-gray-500">
-              © 2025 TimingoTech. All rights reserved.
-            </div>
-          </div>
-        </div>
-      </footer>
+ 
     </div>
   );
 };

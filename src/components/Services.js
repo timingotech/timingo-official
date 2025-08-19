@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Brain, Smartphone, Cloud, Database, Shield, Globe, ArrowRight, CheckCircle, Star, Users, Target, Zap, Code, Award, TrendingUp, ChevronRight, ExternalLink, Mail, Phone } from 'lucide-react';
+import { Brain, Smartphone, Cloud, Database, Shield, Globe, ArrowRight, CheckCircle, Star, Users, Target, Zap, Code, Award, TrendingUp, ChevronRight, ExternalLink, Mail, Phone, X } from 'lucide-react';
 
 const Services = () => {
   const [animateOnLoad, setAnimateOnLoad] = useState(false);
@@ -32,6 +32,10 @@ const Services = () => {
 
   const handleEmailClick = () => {
     window.location.href = 'mailto:hello@timingotech.com';
+  };
+
+  const handlePhoneClick = () => {
+    window.location.href = 'tel:+2349022013174';
   };
 
   const services = [
@@ -208,6 +212,8 @@ const Services = () => {
     }
   ];
 
+  const selectedService = services.find(service => service.id === activeService);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
       <style jsx>{`
@@ -239,6 +245,14 @@ const Services = () => {
         .service-card:hover {
           transform: translateY(-5px);
           box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .modal-overlay {
+          background: rgba(0, 0, 0, 0.5);
+          backdrop-filter: blur(4px);
+        }
+        .modal-content {
+          max-height: 90vh;
+          overflow-y: auto;
         }
       `}</style>
 
@@ -278,7 +292,7 @@ const Services = () => {
             {services.map((service, index) => (
               <div 
                 key={service.id} 
-                className="service-card bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 "
+                className="service-card bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <div className={`bg-gradient-to-br ${service.bgGradient} p-8 text-white`}>
@@ -319,74 +333,105 @@ const Services = () => {
                   </div>
                   
                   <button
-                    onClick={() => setActiveService(activeService === service.id ? null : service.id)}
+                    onClick={() => setActiveService(service.id)}
                     className={`w-full bg-gradient-to-r ${service.bgGradient} text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2`}
                   >
                     Learn More <ChevronRight className="w-5 h-5" />
                   </button>
                 </div>
-
-                {/* Expanded Details */}
-                {activeService === service.id && (
-                  <div className="border-t border-gray-200 bg-gray-50 p-8 animate-on-scroll">
-                    <div className="space-y-6">
-                      <div>
-                        <h4 className="font-semibold text-gray-900 mb-3">All Features:</h4>
-                        <div className="grid grid-cols-1 gap-2">
-                          {service.features.map((feature, i) => (
-                            <div key={i} className="flex items-start gap-2">
-                              <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                              <span className="text-gray-600 text-sm">{feature}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div>
-                        <h4 className="font-semibold text-gray-900 mb-3">Technologies:</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {service.technologies.map((tech, i) => (
-                            <span key={i} className="px-3 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                              {tech}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div>
-                        <h4 className="font-semibold text-gray-900 mb-3">Use Cases:</h4>
-                        <div className="space-y-3">
-                          {service.useCases.map((useCase, i) => (
-                            <div key={i} className="border-l-4 border-blue-500 pl-4">
-                              <div className="font-medium text-gray-900">{useCase.title}</div>
-                              <div className="text-gray-600 text-sm">{useCase.desc}</div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="flex gap-3">
-                        <button 
-                          onClick={() => handleNavigation('/contact')}
-                          className="flex-1 bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors"
-                        >
-                          Get Quote
-                        </button>
-                        <button 
-                          onClick={() => handleNavigation('/projects')}
-                          className="flex-1 border border-blue-600 text-blue-600 py-2 rounded-lg font-medium hover:bg-blue-50 transition-colors"
-                        >
-                          View Examples
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
             ))}
           </div>
         </div>
       </section>
+
+      {/* Modal */}
+      {activeService && selectedService && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full modal-content">
+            <div className={`bg-gradient-to-br ${selectedService.bgGradient} p-8 text-white rounded-t-2xl relative`}>
+              <button
+                onClick={() => setActiveService(null)}
+                className="absolute top-4 right-4 p-2 hover:bg-white/20 rounded-full transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+              <div className="flex items-center gap-4 mb-4">
+                <div className="text-white/90">{selectedService.icon}</div>
+                <div>
+                  <h3 className="text-3xl font-bold">{selectedService.title}</h3>
+                  <p className="text-white/90">{selectedService.subtitle}</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="p-8">
+              <p className="text-gray-600 mb-8 text-lg leading-relaxed">{selectedService.description}</p>
+              
+              <div className="grid md:grid-cols-2 gap-8 mb-8">
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-4 text-lg">All Features:</h4>
+                  <div className="space-y-3">
+                    {selectedService.features.map((feature, i) => (
+                      <div key={i} className="flex items-start gap-3">
+                        <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                        <span className="text-gray-600">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-4 text-lg">Technologies:</h4>
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    {selectedService.technologies.map((tech, i) => (
+                      <span key={i} className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+
+                  <h4 className="font-semibold text-gray-900 mb-4 text-lg">Use Cases:</h4>
+                  <div className="space-y-4">
+                    {selectedService.useCases.map((useCase, i) => (
+                      <div key={i} className="border-l-4 border-blue-500 pl-4">
+                        <div className="font-medium text-gray-900">{useCase.title}</div>
+                        <div className="text-gray-600">{useCase.desc}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between mb-8 p-6 bg-gray-50 rounded-lg">
+                <div>
+                  <div className="text-gray-500 mb-1">Starting from</div>
+                  <div className="font-bold text-2xl text-gray-900">{selectedService.pricing}</div>
+                </div>
+                <div className="text-right">
+                  <div className="text-gray-500 mb-1">Timeline</div>
+                  <div className="font-bold text-2xl text-gray-900">{selectedService.timeline}</div>
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <button 
+                  onClick={() => handleNavigation('/contact')}
+                  className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                >
+                  Get Quote
+                </button>
+                <button 
+                  onClick={() => handleNavigation('/projects')}
+                  className="flex-1 border border-blue-600 text-blue-600 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+                >
+                  View Examples
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Process Section */}
       <section className="py-20 px-6 bg-white">
@@ -477,19 +522,19 @@ const Services = () => {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
-              onClick={() => handleNavigation('/contact')}
+              onClick={handleEmailClick}
               className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 flex items-center justify-center gap-2"
             >
               <Mail className="w-5 h-5" />
-              Get Free Consultation
+              hello@timingotech.com
             </button>
             
             <button
-              onClick={handleEmailClick}
+              onClick={handlePhoneClick}
               className="px-8 py-4 border-2 border-blue-600 text-blue-600 rounded-lg font-semibold hover:bg-blue-600 hover:text-white transition-all duration-300 flex items-center justify-center gap-2"
             >
               <Phone className="w-5 h-5" />
-              Schedule a Call
+              +234-90-220-13174
             </button>
           </div>
 

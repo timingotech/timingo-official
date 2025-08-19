@@ -1,8 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { ExternalLink, ArrowRight, Users, Target, Zap, Brain, Leaf, Calendar, Mail, Code, Globe, Github, ChevronRight, Award, TrendingUp, Shield, Phone, MapPin, Clock, MessageCircle } from 'lucide-react';
+import { ExternalLink, ArrowRight, Users, Target, Zap, Brain, Leaf, Calendar, Mail, Code, Globe, Github, ChevronRight, Award, TrendingUp, Shield, Phone, MapPin, Clock, MessageCircle, Loader2, CheckCircle } from 'lucide-react';
+import axios from "axios";
 
 const Contact = () => {
   const [animateOnLoad, setAnimateOnLoad] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null); // 'success', 'error', or null
   const form = useRef();
 
   useEffect(() => {
@@ -29,24 +32,44 @@ const Contact = () => {
     };
   }, []);
 
-  const sendEmail = (e) => {
-    e.preventDefault();
-    
-    // Simulate email sending (replace with actual emailjs implementation)
-    // emailjs.sendForm('service_bt2q0z7', 'template_kwl0ojh', form.current, 'Yz16g8qPG_-f9ArRT')
-    //   .then((result) => {
-    //       console.log(result.text);
-    //       window.alert('Email sent successfully!');
-    //       window.location.reload();
-    //   }, (error) => {
-    //       console.log(error.text);
-    //       window.alert('Failed to send email. Please try again later.');
-    //   });
-    
-    // For demo purposes
-    alert('Email sent successfully!');
-    form.current.reset();
+const sendEmail = async (e) => {
+  e.preventDefault();
+  setIsSubmitting(true);
+  setSubmitStatus(null);
+
+  const formData = new FormData(form.current);
+  const payload = {
+    name: formData.get("user_name"),
+    email: formData.get("user_email"),
+    phone: formData.get("user_phone"),
+    company: formData.get("user_company"),
+    service_interest: formData.get("service_interest"),
+    message: formData.get("message"),
   };
+
+  try {
+    await axios.post("https://serenimindbackend.onrender.com/api/contact/", payload, {
+      headers: { "Content-Type": "application/json" }
+    });
+    
+    setSubmitStatus('success');
+    
+    // Wait 3 seconds then reload the page
+    setTimeout(() => {
+      window.location.reload();
+    }, 3000);
+    
+  } catch (error) {
+    console.error(error);
+    setSubmitStatus('error');
+    setIsSubmitting(false);
+    
+    // Reset error status after 5 seconds
+    setTimeout(() => {
+      setSubmitStatus(null);
+    }, 5000);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
@@ -102,6 +125,21 @@ const Contact = () => {
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
+        }
+        .pulse-success {
+          animation: pulse-success 0.6s ease-in-out;
+        }
+        @keyframes pulse-success {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.05); }
+          100% { transform: scale(1); }
+        }
+        .fade-in {
+          animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
         }
       `}</style>
 
@@ -269,7 +307,8 @@ const Contact = () => {
                     name="user_name" 
                     placeholder="Your name" 
                     required
-                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition-colors text-lg"
+                    disabled={isSubmitting}
+                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition-colors text-lg disabled:bg-gray-100 disabled:cursor-not-allowed"
                   />
                 </div>
                 
@@ -283,7 +322,8 @@ const Contact = () => {
                     name="user_email" 
                     placeholder="Your email" 
                     required
-                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition-colors text-lg"
+                    disabled={isSubmitting}
+                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition-colors text-lg disabled:bg-gray-100 disabled:cursor-not-allowed"
                   />
                 </div>
               </div>
@@ -298,7 +338,8 @@ const Contact = () => {
                     id="phone" 
                     name="user_phone" 
                     placeholder="Your phone number" 
-                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition-colors text-lg"
+                    disabled={isSubmitting}
+                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition-colors text-lg disabled:bg-gray-100 disabled:cursor-not-allowed"
                   />
                 </div>
                 
@@ -311,7 +352,8 @@ const Contact = () => {
                     id="company" 
                     name="user_company" 
                     placeholder="Your company name" 
-                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition-colors text-lg"
+                    disabled={isSubmitting}
+                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition-colors text-lg disabled:bg-gray-100 disabled:cursor-not-allowed"
                   />
                 </div>
               </div>
@@ -323,7 +365,8 @@ const Contact = () => {
                 <select 
                   id="service" 
                   name="service_interest"
-                  className="w-full px-4 py-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition-colors text-lg"
+                  disabled={isSubmitting}
+                  className="w-full px-4 py-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition-colors text-lg disabled:bg-gray-100 disabled:cursor-not-allowed"
                 >
                   <option value="">Select a service</option>
                   <option value="mental-health">Health Technology </option>
@@ -345,19 +388,63 @@ const Contact = () => {
                   placeholder="Tell us about your project, goals, and how we can help you..."
                   rows="6"
                   required
-                  className="w-full px-4 py-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition-colors text-lg resize-vertical"
+                  disabled={isSubmitting}
+                  className="w-full px-4 py-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition-colors text-lg resize-vertical disabled:bg-gray-100 disabled:cursor-not-allowed"
                 ></textarea>
               </div>
 
               <div className="text-center">
                 <button 
                   type="submit" 
-                  className="px-12 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-bold text-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-2 mx-auto"
+                  disabled={isSubmitting || submitStatus === 'success'}
+                  className={`px-12 py-4 rounded-lg font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 mx-auto min-w-[200px] ${
+                    submitStatus === 'success' 
+                      ? 'bg-green-600 text-white pulse-success' 
+                      : submitStatus === 'error'
+                      ? 'bg-red-600 text-white'
+                      : isSubmitting 
+                      ? 'bg-gray-400 text-white cursor-not-allowed'
+                      : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 transform hover:scale-105'
+                  }`}
                 >
-                  <MessageCircle className="w-5 h-5" />
-                  Send Message
+                  {submitStatus === 'success' ? (
+                    <>
+                      <CheckCircle className="w-5 h-5" />
+                      Message Sent!
+                    </>
+                  ) : submitStatus === 'error' ? (
+                    <>
+                      <MessageCircle className="w-5 h-5" />
+                      Failed to Send
+                    </>
+                  ) : isSubmitting ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <MessageCircle className="w-5 h-5" />
+                      Send Message
+                    </>
+                  )}
                 </button>
-                <p className="text-gray-600 mt-4">We'll respond within 24 hours</p>
+                
+                {submitStatus === 'success' && (
+                  <p className="text-green-600 mt-4 fade-in font-semibold">
+                    Thank you! We'll get back to you soon. Page will reload automatically...
+                  </p>
+                )}
+                
+                {submitStatus === 'error' && (
+                  <p className="text-red-600 mt-4 fade-in">
+                    Something went wrong. Please try again or contact us directly.
+                  </p>
+                )}
+                
+                {!submitStatus && !isSubmitting && (
+                  <p className="text-gray-600 mt-4">We'll respond within 24 hours</p>
+                )}
               </div>
             </form>
           </div>

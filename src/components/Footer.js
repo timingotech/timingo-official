@@ -85,7 +85,7 @@ const Footer = () => {
                 <div>
                   <div className="text-sm text-gray-400">Email</div>
                   <a href="mailto:hello@timingotech.com" className="text-white hover:text-blue-400 transition-colors">
-                    hello@timingotech.com
+                    timingotech@gmail.com
                   </a>
                 </div>
               </div>
@@ -96,8 +96,8 @@ const Footer = () => {
                 </div>
                 <div>
                   <div className="text-sm text-gray-400">Phone</div>
-                  <a href="tel:+15551234567" className="text-white hover:text-purple-400 transition-colors">
-                    +1 (555) 123-4567
+                  <a href="tel:+2349022013174" className="text-white hover:text-purple-400 transition-colors">
+                    +234 (902) 201-3174
                   </a>
                 </div>
               </div>
@@ -175,11 +175,11 @@ const Footer = () => {
             <div className="flex items-center space-x-4">
               <span className="text-gray-400 text-sm mr-4">Follow us:</span>
               
-              <a href="#" className="w-10 h-10 bg-gray-800 hover:bg-blue-600 rounded-lg flex items-center justify-center transition-all duration-300 transform hover:scale-110 group">
+              <a href="www.linkedin.com/company/timingotech" className="w-10 h-10 bg-gray-800 hover:bg-blue-600 rounded-lg flex items-center justify-center transition-all duration-300 transform hover:scale-110 group">
                 <Linkedin className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
               </a>
               
-              <a href="#" className="w-10 h-10 bg-gray-800 hover:bg-sky-500 rounded-lg flex items-center justify-center transition-all duration-300 transform hover:scale-110 group">
+              <a href="www.x.com/timingotech" className="w-10 h-10 bg-gray-800 hover:bg-sky-500 rounded-lg flex items-center justify-center transition-all duration-300 transform hover:scale-110 group">
                 <Twitter className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
               </a>
               

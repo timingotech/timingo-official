@@ -61,27 +61,27 @@ const About = () => {
 
   const milestones = [
     {
-      year: "2020",
+      year: "2021",
       title: "Company Founded",
       description: "Timingotech was established with a vision to solve global challenges through innovative AI solutions."
     },
     {
-      year: "2021",
+      year: "2024",
       title: "First Major Platform",
       description: "Launched SereniMind, our breakthrough mental health platform that would go on to help thousands."
     },
     {
-      year: "2022",
-      title: "Corporate Expansion",
-      description: "Introduced Vitaskr, expanding our reach to enterprise clients and corporate wellness programs."
-    },
-    {
-      year: "2023",
+      year: "2024",
       title: "AgriTech Innovation",
       description: "Launched Agritos, revolutionizing sustainable agriculture with AI-powered farming solutions."
     },
     {
-      year: "2024",
+      year: "2025",
+      title: "The Raymond Ofodu Foundation (TROF)",
+      description: "Driving transformative social impact across Africa by delivering solutions that protect children, empower youth, and build resilient communities through education, advocacy, and climate action."
+    },
+    {
+      year: "2025",
       title: "Industry Recognition",
       description: "Received multiple awards for innovation in mental health, corporate wellness, and sustainable agriculture."
     }
