@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Menu, X, ChevronDown, Code, Rocket, Users, Mail, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
-
+import TimingoTechlogo from '../images/TimingoTech.png';
 const Navbar = () => {
   const [showMenu, setShowMenu] = useState(false);
   const [showServices, setShowServices] = useState(false);
@@ -46,12 +46,7 @@ const Navbar = () => {
           {/* Logo */}
         <div className="flex-shrink-0">
             <Link to="/" className="flex items-center space-x-2" onClick={closeMenu}>
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">T</span>
-              </div>
-              <span className={`text-2xl font-bold ${scrolled ? 'text-gray-900' : 'text-white'}`}>
-                Timingo<span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Tech</span>
-              </span>
+            <img src={TimingoTechlogo} className='w-32 md:ml-0 -ml-6' />
             </Link>
           </div>
 
