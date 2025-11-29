@@ -48,17 +48,17 @@ const sendEmail = async (e) => {
   };
 
   try {
-    await axios.post("https://serenimindbackend.onrender.com/api/contact/", payload, {
+    await axios.post("/api/contact", payload, {
       headers: { "Content-Type": "application/json" }
     });
-    
+
     setSubmitStatus('success');
-    
+
     // Wait 3 seconds then reload the page
     setTimeout(() => {
       window.location.reload();
     }, 3000);
-    
+
   } catch (error) {
     console.error(error);
     setSubmitStatus('error');

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Menu, X, ChevronDown, Code, Rocket, Users, Mail, Phone } from 'lucide-react';
+import { Menu, X, ChevronDown, Code, Rocket, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import TimingoTechlogo from '../images/TimingoTech.png';
 const Navbar = () => {

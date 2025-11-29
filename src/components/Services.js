@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Brain, Smartphone, Cloud, Database, Shield, Globe, ArrowRight, CheckCircle, Star, Users, Target, Zap, Code, Award, TrendingUp, ChevronRight, ExternalLink, Mail, Phone, X } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Brain, Smartphone, Cloud, Database, Shield, Globe, ArrowRight, CheckCircle, Users, Target, Zap, Code, Award, TrendingUp, ChevronRight, ExternalLink, Mail, Phone, X } from 'lucide-react';
 
 const Services = () => {
   const [animateOnLoad, setAnimateOnLoad] = useState(false);
   const [activeService, setActiveService] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setAnimateOnLoad(true);
@@ -26,8 +28,8 @@ const Services = () => {
   }, []);
 
   const handleNavigation = (path) => {
-    console.log(`Navigate to: ${path}`);
-    alert(`Navigation to ${path} - In your app, use React Router's useNavigate() or Link component`);
+    if (!path) return;
+    navigate(path);
   };
 
   const handleEmailClick = () => {
