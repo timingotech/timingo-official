@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import axios from 'axios';
 import { ChevronRight, Users, Trophy, Lightbulb, Zap, Shield, Globe, ArrowRight, CheckCircle, Star, TrendingUp, Code, Smartphone, Cloud, Database, Brain, Rocket, Target, Award, X, ExternalLink } from 'lucide-react';
 import {Link} from 'react-router-dom'
 import Microsoft from '../images/Microsoft.jpeg'
@@ -10,6 +11,10 @@ const Home = () => {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [selectedProject, setSelectedProject] = useState(null);
   const form = useRef();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null); // 'success' | 'error' | null
+  const [isSubscribing, setIsSubscribing] = useState(false);
+  const [subscribeStatus, setSubscribeStatus] = useState(null);
 
   useEffect(() => {
     setAnimateOnLoad(true);
@@ -41,17 +46,48 @@ const Home = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const sendEmail = (e) => {  
+  const sendEmail = async (e) => {
     e.preventDefault();
-    // Simulated email sending
-    alert('Message sent successfully!');
-    form.current.reset();
+    setIsSubmitting(true);
+    setSubmitStatus(null);
+
+    const formData = new FormData(form.current);
+    const payload = {
+      name: formData.get('user_name'),
+      email: formData.get('user_email'),
+      message: formData.get('message'),
+    };
+
+    try {
+      await axios.post('/api/contact', payload, { headers: { 'Content-Type': 'application/json' } });
+      setSubmitStatus('success');
+      form.current.reset();
+      setTimeout(() => setSubmitStatus(null), 3000);
+    } catch (err) {
+      console.error(err);
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const newsLetter = (e) => {
+  const newsLetter = async (e) => {
     e.preventDefault();
-    alert('Successfully subscribed to newsletter!');
-    e.target.reset();
+    setIsSubscribing(true);
+    setSubscribeStatus(null);
+    const formEl = e.target;
+    const email = formEl.user_email?.value || '';
+    try {
+      await axios.post('/api/subscribe', { email }, { headers: { 'Content-Type': 'application/json' } });
+      setSubscribeStatus('success');
+      formEl.reset();
+      setTimeout(() => setSubscribeStatus(null), 3000);
+    } catch (err) {
+      console.error(err);
+      setSubscribeStatus('error');
+    } finally {
+      setIsSubscribing(false);
+    }
   };
 
   const partners = [

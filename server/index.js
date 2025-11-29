@@ -22,7 +22,10 @@ function createTransporter() {
   const port = parseInt(process.env.SMTP_PORT || '465', 10);
   const secure = (process.env.SMTP_SECURE === 'true' || port === 465);
 
-  return nodemailer.createTransport({
+  // Optionally allow self-signed certificates (useful for some SMTP/TLS setups or corporate proxies)
+  const allowSelfSigned = process.env.SMTP_ALLOW_SELF_SIGNED === 'true';
+
+  const transportOptions = {
     host,
     port,
     secure,
@@ -30,7 +33,18 @@ function createTransporter() {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
     },
-  });
+  };
+
+  if (allowSelfSigned) {
+    transportOptions.tls = { rejectUnauthorized: false };
+  }
+
+  // For explicit TLS on port 587 ensure STARTTLS is used
+  if (!secure && port === 587) {
+    transportOptions.requireTLS = true;
+  }
+
+  return nodemailer.createTransport(transportOptions);
 }
 
 // Health check
