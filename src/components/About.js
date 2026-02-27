@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Users, Target, Zap, Brain, Leaf, Calendar, Mail, Code, Globe, Github, ChevronRight, Award, TrendingUp, Shield, Lightbulb, Heart, Rocket } from 'lucide-react';
+import { Users, Target, Brain, Mail, Globe, ChevronRight, Award, TrendingUp, Shield, Lightbulb, Heart, Rocket } from 'lucide-react';
 
 const About = () => {
   const [animateOnLoad, setAnimateOnLoad] = useState(false);

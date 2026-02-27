@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ExternalLink, ArrowRight, Users, Target, Zap, Brain, Leaf, Calendar, Mail, Code, Globe, Github, ChevronRight, Award, TrendingUp, Shield, Phone, MapPin, Clock, MessageCircle, Loader2, CheckCircle } from 'lucide-react';
+import { ExternalLink, ArrowRight, Users, Mail, Phone, MapPin, Clock, MessageCircle, Loader2, CheckCircle } from 'lucide-react';
 import axios from "axios";
 
 const Contact = () => {

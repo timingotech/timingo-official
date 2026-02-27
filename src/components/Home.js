@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { Helmet } from 'react-helmet-async';
-import { ChevronRight, Users, Trophy, Lightbulb, Zap, Shield, Globe, ArrowRight, CheckCircle, Star, TrendingUp, Code, Smartphone, Cloud, Database, Brain, Rocket, Target, Award, X, ExternalLink } from 'lucide-react';
+import { ChevronRight, Users, Trophy, Lightbulb, Zap, Shield, Globe, ArrowRight, CheckCircle, Star, Smartphone, Cloud, Database, Brain, Rocket, Target, X, ExternalLink } from 'lucide-react';
 import {Link} from 'react-router-dom'
 import Microsoft from '../images/Microsoft.jpeg'
 import SereniMind from '../images/SereniMind.png'
@@ -12,9 +12,13 @@ const Home = () => {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [selectedProject, setSelectedProject] = useState(null);
   const form = useRef();
+  // eslint-disable-next-line no-unused-vars
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // eslint-disable-next-line no-unused-vars
   const [submitStatus, setSubmitStatus] = useState(null); // 'success' | 'error' | null
+  // eslint-disable-next-line no-unused-vars
   const [isSubscribing, setIsSubscribing] = useState(false);
+  // eslint-disable-next-line no-unused-vars
   const [subscribeStatus, setSubscribeStatus] = useState(null);
 
   useEffect(() => {
