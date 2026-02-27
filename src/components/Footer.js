@@ -297,7 +297,7 @@ const Footer = () => {
                 <Linkedin className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
               </a>
 
-              <a aria-label="TimingoTech on X" href="https://x.com/timingotech" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 hover:bg-sky-500 rounded-lg flex items-center justify-center transition-all duration-300 transform hover:scale-110 group">
+              <a aria-label="TimingoTech on X" href="https://x.com/_timingotech" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 hover:bg-sky-500 rounded-lg flex items-center justify-center transition-all duration-300 transform hover:scale-110 group">
                 <Twitter className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
               </a>
 
