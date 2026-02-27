@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { Users, Target, Zap, Brain, Leaf, Calendar, Mail, Code, Globe, Github, ChevronRight, Award, TrendingUp, Shield, Lightbulb, Heart, Rocket } from 'lucide-react';
 
 const About = () => {
@@ -89,6 +90,12 @@ const About = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
+      <Helmet>
+        <title>About Us - Timingotech | Our Story & Mission</title>
+        <meta name="description" content="Learn about Timingotech's mission to innovate with precision timing and AI. Discover our journey, values, and the team driving technological innovation across industries." />
+        <meta name="keywords" content="about Timingotech, our mission, company values, AI innovation, technology team" />
+        <link rel="canonical" href="https://www.timingotech.com/about" />
+      </Helmet>
       <style jsx>{`
         .animate-on-scroll {
           opacity: 0;

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { ExternalLink, ArrowRight, Users, Target, Zap, Brain, Leaf, Calendar, Mail, Code, Globe, Github, ChevronRight, Award, TrendingUp, Shield, Phone, MapPin, Clock, MessageCircle, Loader2, CheckCircle } from 'lucide-react';
 import axios from "axios";
 
@@ -73,6 +74,12 @@ const sendEmail = async (e) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
+      <Helmet>
+        <title>Contact Us - Timingotech | Get In Touch</title>
+        <meta name="description" content="Contact Timingotech for AI solutions, web development, mobile apps, and technology consulting. Reach out to discuss your project and let's build something amazing together." />
+        <meta name="keywords" content="contact Timingotech, get in touch, technology consulting, project inquiry" />
+        <link rel="canonical" href="https://www.timingotech.com/contact" />
+      </Helmet>
       <style jsx>{`
         .animate-on-scroll {
           opacity: 0;

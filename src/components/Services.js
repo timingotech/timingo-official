@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Brain, Smartphone, Cloud, Database, Shield, Globe, ArrowRight, CheckCircle, Users, Target, Zap, Code, Award, TrendingUp, ChevronRight, ExternalLink, Mail, Phone, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
+import { Brain, Smartphone, Cloud, Database, Shield, Globe, ArrowRight, CheckCircle, Users, Target, Zap, Code, Award, TrendingUp, ChevronRight, Mail, Phone, X } from 'lucide-react';
 
 const Services = () => {
-  const [animateOnLoad, setAnimateOnLoad] = useState(false);
   const [activeService, setActiveService] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    setAnimateOnLoad(true);
   }, []);
 
   useEffect(() => {
@@ -218,6 +217,12 @@ const Services = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
+      <Helmet>
+        <title>Our Services - Timingotech | AI, Web, Mobile & Cloud Solutions</title>
+        <meta name="description" content="Expert technology services including AI & Machine Learning, Web Development, Mobile Apps, Cloud Solutions, Cybersecurity, and Database Management. Custom solutions for your business needs." />
+        <meta name="keywords" content="AI services, machine learning, web development services, mobile app development, cloud solutions, cybersecurity, database management" />
+        <link rel="canonical" href="https://www.timingotech.com/services" />
+      </Helmet>
       <style jsx>{`
         .animate-on-scroll {
           opacity: 0;

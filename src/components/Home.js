@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
+import { Helmet } from 'react-helmet-async';
 import { ChevronRight, Users, Trophy, Lightbulb, Zap, Shield, Globe, ArrowRight, CheckCircle, Star, TrendingUp, Code, Smartphone, Cloud, Database, Brain, Rocket, Target, Award, X, ExternalLink } from 'lucide-react';
 import {Link} from 'react-router-dom'
 import Microsoft from '../images/Microsoft.jpeg'
@@ -219,6 +220,12 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <Helmet>
+        <title>Timingotech - AI & Technology Solutions for Global Innovation</title>
+        <meta name="description" content="We innovate with precision timing and AI to solve global challenges across industries. Expert services in AI/ML, web development, mobile apps, cloud solutions, and cybersecurity." />
+        <meta name="keywords" content="AI solutions, machine learning, web development, technology consulting, Timingotech" />
+        <link rel="canonical" href="https://www.timingotech.com/" />
+      </Helmet>
       <style jsx>{`
         .animate-on-scroll {
           opacity: 0;

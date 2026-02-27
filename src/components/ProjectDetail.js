@@ -1,5 +1,6 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { ExternalLink } from 'lucide-react';
 
 // Minimal project data — keep in sync with Project.js
@@ -27,6 +28,12 @@ const ProjectDetail = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 p-8">
+      <Helmet>
+        <title>{project.title} - Timingotech | Project Details</title>
+        <meta name="description" content={`Explore ${project.title}: ${project.description}. A successful project by Timingotech showcasing innovative technology solutions.`} />
+        <meta name="keywords" content={`${project.title}, Timingotech project, ${project.description}`} />
+        <link rel="canonical" href={`https://www.timingotech.com/projects/${project.id}`} />
+      </Helmet>
       <div className="max-w-4xl mx-auto bg-white rounded-xl p-8 shadow-lg">
         <h1 className="text-3xl font-bold mb-4">{project.title}</h1>
         <p className="text-gray-700 mb-6">{project.description}</p>

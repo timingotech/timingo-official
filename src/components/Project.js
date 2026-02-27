@@ -1,12 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ExternalLink, ArrowRight, Users, Target, Zap, Brain, Leaf, Calendar, Mail, Code, Globe, Github, ChevronRight, Award, TrendingUp, Shield } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
+import { ExternalLink, ArrowRight, Users, Target, Zap, Mail, Code, Globe, ChevronRight, Award } from 'lucide-react';
 
 const Project = () => {
-  const [animateOnLoad, setAnimateOnLoad] = useState(false);
-
   useEffect(() => {
-    setAnimateOnLoad(true);
   }, []);
 
   useEffect(() => {
@@ -118,6 +116,12 @@ const Project = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
+      <Helmet>
+        <title>Our Projects - Timingotech | Success Stories & Case Studies</title>
+        <meta name="description" content="Explore Timingotech's portfolio of successful projects including SereniMind, Agritos, MediaFlow, and more. See how we transform businesses with innovative technology solutions." />
+        <meta name="keywords" content="Timingotech projects, case studies, portfolio, technology solutions, AI projects, web development projects" />
+        <link rel="canonical" href="https://www.timingotech.com/projects" />
+      </Helmet>
       <style jsx>{`
         .animate-on-scroll {
           opacity: 0;

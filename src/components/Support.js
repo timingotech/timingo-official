@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 
 const Support = () => {
   const [amount, setAmount] = useState(0);
@@ -45,6 +46,12 @@ const Support = () => {
 
   return (
     <div className='bg-[#F7F7FA]'>
+      <Helmet>
+        <title>Support Us - Timingotech | Make a Donation</title>
+        <meta name="description" content="Support Timingotech's community initiatives and technological innovation. Your donation helps us continue building solutions that make a difference." />
+        <meta name="keywords" content="support Timingotech, donate, community support, technology innovation" />
+        <link rel="canonical" href="https://www.timingotech.com/support" />
+      </Helmet>
       <div className="container p-8 mx-auto">
         <div className="mb-8 ">
           <h2 className="mb-4 text-2xl font-bold text-center hometext-gradient">Make a Donation and Support Our Community</h2>
