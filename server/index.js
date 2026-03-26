@@ -142,4 +142,53 @@ app.post('/api/subscribe', async (req, res) => {
   return res.json({ ok: true });
 });
 
+// Demo booking endpoint for TimingoFlow
+app.post('/api/demo', async (req, res) => {
+  const { name, email, phone, industry } = req.body || {};
+
+  if (!name || !email) {
+    return res.status(400).json({ error: 'Missing required fields: name, email' });
+  }
+
+  const transporter = createTransporter();
+
+  const adminMailOptions = {
+    from: `${process.env.FROM_NAME} <${process.env.FROM_EMAIL}>`,
+    to: process.env.ADMIN_EMAIL,
+    subject: `🚀 New TimingoFlow Demo Request from ${name}`,
+    html: `<h3>New TimingoFlow Demo Booking</h3>
+      <p><strong>Name:</strong> ${name}</p>
+      <p><strong>Email:</strong> ${email}</p>
+      <p><strong>Phone:</strong> ${phone || 'Not provided'}</p>
+      <p><strong>Industry:</strong> ${industry || 'Not specified'}</p>
+      <hr/>
+      <p><em>Follow up with this lead to schedule their 10-minute demo!</em></p>
+    `,
+  };
+
+  try {
+    await transporter.sendMail(adminMailOptions);
+
+    // Send confirmation to user
+    if (process.env.SEND_AUTOREPLY === 'true') {
+      const replyOptions = {
+        from: `${process.env.FROM_NAME} <${process.env.FROM_EMAIL}>`,
+        to: email,
+        subject: 'Your TimingoFlow Demo Request',
+        html: `<p>Hi ${name},</p>
+          <p>Thanks for your interest in TimingoFlow! We've received your demo request and will get back to you within 24 hours to schedule your 10-minute demo.</p>
+          <p>In the meantime, feel free to reply to this email if you have any questions.</p>
+          <p>Best regards,<br/>${process.env.FROM_NAME}</p>
+        `,
+      };
+      transporter.sendMail(replyOptions).catch((err) => console.error('Demo auto-reply error:', err));
+    }
+
+    return res.json({ ok: true });
+  } catch (err) {
+    console.error('Demo email error:', err);
+    return res.status(500).json({ error: 'Failed to send demo request' });
+  }
+});
+
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

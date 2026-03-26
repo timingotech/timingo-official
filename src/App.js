@@ -10,6 +10,7 @@ import Support from './components/Support';
 import Footer from './components/Footer';
 import Project from './components/Project';
 import ProjectDetail from './components/ProjectDetail';
+import TimingoFlow from './components/TimingoFlow';
 import NotFound from './components/NotFound';
 
 
@@ -26,6 +27,7 @@ function App() {
          <Route path='/support' element={<Support/>}/> 
          <Route path='/projects' element={<Project/>}/>
          <Route path='/projects/:id' element={<ProjectDetail/>} />
+         <Route path='/timingoflow' element={<TimingoFlow/>} />
         <Route path='*' element={<NotFound/>} />
       </Routes>
       <Footer/>

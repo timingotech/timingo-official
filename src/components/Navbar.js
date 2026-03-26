@@ -103,6 +103,12 @@ const Navbar = () => {
               Projects
             </Link>
             <Link 
+              to="/timingoflow" 
+              className={`font-medium transition-colors hover:text-purple-600 ${scrolled ? 'text-purple-600' : 'text-white'}`}
+            >
+              TimingoFlow ✨
+            </Link>
+            <Link 
               to="/contact" 
               className={`font-medium transition-colors hover:text-blue-600 ${scrolled ? 'text-gray-700' : 'text-white'}`}
             >
@@ -183,6 +189,9 @@ const Navbar = () => {
 
          <Link to="/projects" onClick={closeMenu} className="block text-lg font-medium text-gray-700 hover:text-blue-600 transition-colors">
             Projects
+          </Link>
+          <Link to="/timingoflow" onClick={closeMenu} className="block text-lg font-medium text-purple-600 hover:text-purple-700 transition-colors">
+            TimingoFlow ✨
           </Link>
           <Link to="/contact" onClick={closeMenu} className="block text-lg font-medium text-gray-700 hover:text-blue-600 transition-colors">
             Contact
