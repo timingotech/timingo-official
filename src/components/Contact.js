@@ -255,23 +255,13 @@ const sendEmail = async (e) => {
                     <div className="flex items-start gap-3 mb-4">
                       <MapPin className="w-5 h-5 text-purple-600 mt-1 flex-shrink-0" />
                       <div>
-                        Bello Folawuyo Crescent,<br />
-                        Lagos State, 10001,<br />
-                        Nigeria.
+                        Available Worldwide
                       </div>
                     </div>
                   </address>
                 </div>
 
                 <div className="space-y-4">
-                  <button 
-                    className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-300 flex items-center justify-center gap-2"
-                    onClick={() => window.open('https://maps.google.com/?q=Bello+Folawuyo+Crescent+Lagos+Nigeria', '_blank')}
-                  >
-                    <MapPin className="w-5 h-5" />
-                    View on Google Maps
-                  </button>
-                  
                   <div className="grid grid-cols-2 gap-4">
                     <div className="p-4 bg-gray-50 rounded-lg text-center">
                       <Clock className="w-6 h-6 text-blue-600 mx-auto mb-2" />

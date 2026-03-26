@@ -116,7 +116,7 @@ const Home = () => {
       category: 'Mental Health Tech Startup',
       achievement: '300,000+ Users',
       description: 'AI-powered mental health platform providing therapy, community support, and wellness tools',
-      metrics: ['Over 10+ African & global partnerships', '99.9% uptime', 'Top 100 Health Companies in Nigeria'],
+      metrics: ['Over 10+ African & global partnerships', '99.9% uptime', 'Top 100 Health Companies'],
       tech: ['React', 'Django REST', 'TensorFlow', 'AWS'],
       website: 'https://serenimind.com.ng',
       fullDescription: 'SereniMind is a revolutionary mental health platform that combines AI technology with human expertise to provide accessible mental health care across Africa. The platform offers personalized therapy sessions, community support groups, wellness tracking, and crisis intervention services.',
@@ -710,8 +710,7 @@ const Home = () => {
                 <div className="space-y-4 text-gray-300">
                   <div>📧 timingotech@gmail.com</div>
                   <div>📞 +234 (902) 201-3174</div>
-                  <div>📍 Lagos, Nigeria</div>
-                  <div>🕒 Mon-Sat: 9:00 AM - 6:00 PM</div>
+                  <div> Mon-Sat: 9:00 AM - 6:00 PM</div>
                 </div>
               </div>
             </div>

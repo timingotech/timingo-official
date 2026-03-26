@@ -205,8 +205,8 @@ const Footer = () => {
                   <MapPin className="w-5 h-5 text-green-400" />
                 </div>
                 <div>
-                  <div className="text-sm text-gray-400">Address</div>
-                  <div className="text-white">Lagos, Nigeria</div>
+                  <div className="text-sm text-gray-400">Service</div>
+                  <div className="text-white">Worldwide</div>
                 </div>
               </div>
             </div>
