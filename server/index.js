@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 const fs = require('fs');
 const path = require('path');
 
@@ -16,36 +16,8 @@ app.use(express.json());
 const limiter = rateLimit({ windowMs: 60 * 1000, max: 30 });
 app.use(limiter);
 
-// Simple transporter using SMTP credentials from env
-function createTransporter() {
-  const host = process.env.SMTP_HOST;
-  const port = parseInt(process.env.SMTP_PORT || '465', 10);
-  const secure = (process.env.SMTP_SECURE === 'true' || port === 465);
-
-  // Optionally allow self-signed certificates (useful for some SMTP/TLS setups or corporate proxies)
-  const allowSelfSigned = process.env.SMTP_ALLOW_SELF_SIGNED === 'true';
-
-  const transportOptions = {
-    host,
-    port,
-    secure,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  };
-
-  if (allowSelfSigned) {
-    transportOptions.tls = { rejectUnauthorized: false };
-  }
-
-  // For explicit TLS on port 587 ensure STARTTLS is used
-  if (!secure && port === 587) {
-    transportOptions.requireTLS = true;
-  }
-
-  return nodemailer.createTransport(transportOptions);
-}
+// Initialize Resend
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Health check
 app.get('/api/health', (req, res) => res.json({ ok: true }));
@@ -58,34 +30,30 @@ app.post('/api/contact', async (req, res) => {
     return res.status(400).json({ error: 'Missing required fields: name, email, message' });
   }
 
-  const transporter = createTransporter();
-
-  const adminMailOptions = {
-    from: `${process.env.FROM_NAME} <${process.env.FROM_EMAIL}>`,
-    to: process.env.ADMIN_EMAIL,
-    subject: `New contact from ${name} (${email})`,
-    html: `<h3>New contact submission</h3>
-      <p><strong>Name:</strong> ${name}</p>
-      <p><strong>Email:</strong> ${email}</p>
-      <p><strong>Phone:</strong> ${phone || 'N/A'}</p>
-      <p><strong>Company:</strong> ${company || 'N/A'}</p>
-      <p><strong>Service Interest:</strong> ${service_interest || 'N/A'}</p>
-      <p><strong>Message:</strong><br/>${message}</p>
-    `,
-  };
-
   try {
-    await transporter.sendMail(adminMailOptions);
+    // Send to admin
+    await resend.emails.send({
+      from: `${process.env.FROM_NAME} <${process.env.FROM_EMAIL}>`,
+      to: process.env.ADMIN_EMAIL,
+      subject: `New contact from ${name} (${email})`,
+      html: `<h3>New contact submission</h3>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Phone:</strong> ${phone || 'N/A'}</p>
+        <p><strong>Company:</strong> ${company || 'N/A'}</p>
+        <p><strong>Service Interest:</strong> ${service_interest || 'N/A'}</p>
+        <p><strong>Message:</strong><br/>${message}</p>
+      `,
+    });
 
-    // Optionally send auto-reply to user
+    // Send auto-reply to user
     if (process.env.SEND_AUTOREPLY === 'true') {
-      const replyOptions = {
+      resend.emails.send({
         from: `${process.env.FROM_NAME} <${process.env.FROM_EMAIL}>`,
         to: email,
         subject: `Thanks for contacting ${process.env.FROM_NAME}`,
         text: `Hi ${name},\n\nThanks for reaching out. We'll review your message and get back to you within 24 hours.\n\nBest regards,\n${process.env.FROM_NAME}`,
-      };
-      transporter.sendMail(replyOptions).catch((err) => console.error('Auto-reply error:', err));
+      }).catch((err) => console.error('Auto-reply error:', err));
     }
 
     return res.json({ ok: true });
@@ -128,16 +96,13 @@ app.post('/api/subscribe', async (req, res) => {
     console.error('Failed to save subscriber', e);
   }
 
-  // send welcome email
-  const transporter = createTransporter();
-  const mailOptions = {
+  // Send welcome email
+  resend.emails.send({
     from: `${process.env.FROM_NAME} <${process.env.FROM_EMAIL}>`,
     to: email,
     subject: `Thanks for subscribing to ${process.env.FROM_NAME}`,
     text: `Thanks for subscribing! We'll keep you updated with our latest news and insights.`,
-  };
-
-  transporter.sendMail(mailOptions).catch(err => console.error('Subscribe email error:', err));
+  }).catch(err => console.error('Subscribe email error:', err));
 
   return res.json({ ok: true });
 });
@@ -150,28 +115,25 @@ app.post('/api/demo', async (req, res) => {
     return res.status(400).json({ error: 'Missing required fields: name, email' });
   }
 
-  const transporter = createTransporter();
-
-  const adminMailOptions = {
-    from: `${process.env.FROM_NAME} <${process.env.FROM_EMAIL}>`,
-    to: process.env.ADMIN_EMAIL,
-    subject: `🚀 New TimingoFlow Demo Request from ${name}`,
-    html: `<h3>New TimingoFlow Demo Booking</h3>
-      <p><strong>Name:</strong> ${name}</p>
-      <p><strong>Email:</strong> ${email}</p>
-      <p><strong>Phone:</strong> ${phone || 'Not provided'}</p>
-      <p><strong>Industry:</strong> ${industry || 'Not specified'}</p>
-      <hr/>
-      <p><em>Follow up with this lead to schedule their 10-minute demo!</em></p>
-    `,
-  };
-
   try {
-    await transporter.sendMail(adminMailOptions);
+    // Send to admin
+    await resend.emails.send({
+      from: `${process.env.FROM_NAME} <${process.env.FROM_EMAIL}>`,
+      to: process.env.ADMIN_EMAIL,
+      subject: `🚀 New TimingoFlow Demo Request from ${name}`,
+      html: `<h3>New TimingoFlow Demo Booking</h3>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Phone:</strong> ${phone || 'Not provided'}</p>
+        <p><strong>Industry:</strong> ${industry || 'Not specified'}</p>
+        <hr/>
+        <p><em>Follow up with this lead to schedule their 10-minute demo!</em></p>
+      `,
+    });
 
     // Send confirmation to user
     if (process.env.SEND_AUTOREPLY === 'true') {
-      const replyOptions = {
+      resend.emails.send({
         from: `${process.env.FROM_NAME} <${process.env.FROM_EMAIL}>`,
         to: email,
         subject: 'Your TimingoFlow Demo Request',
@@ -180,8 +142,7 @@ app.post('/api/demo', async (req, res) => {
           <p>In the meantime, feel free to reply to this email if you have any questions.</p>
           <p>Best regards,<br/>${process.env.FROM_NAME}</p>
         `,
-      };
-      transporter.sendMail(replyOptions).catch((err) => console.error('Demo auto-reply error:', err));
+      }).catch((err) => console.error('Demo auto-reply error:', err));
     }
 
     return res.json({ ok: true });
