@@ -90,11 +90,11 @@ const TimingoFlow = () => {
 
   const features = [
     { icon: <Calendar className="w-6 h-6" />, text: 'Up to 7,500 leads/month' },
-    { icon: <Filter className="w-6 h-6" />, text: 'AI qualification & scoring' },
-    { icon: <MessageSquare className="w-6 h-6" />, text: '300 AI-assisted messages/day' },
-    { icon: <Users className="w-6 h-6" />, text: 'Kanban board management' },
-    { icon: <Clock className="w-6 h-6" />, text: 'Automated follow-up system' },
-    { icon: <TrendingUp className="w-6 h-6" />, text: 'Full analytics & tracking' }
+    { icon: <Filter className="w-6 h-6" />, text: 'AI prompt credits for workflows' },
+    { icon: <MessageSquare className="w-6 h-6" />, text: 'Unlimited AI chat sessions' },
+    { icon: <Users className="w-6 h-6" />, text: 'Multi-channel outreach' },
+    { icon: <Clock className="w-6 h-6" />, text: 'Saved workflows & automation' },
+    { icon: <TrendingUp className="w-6 h-6" />, text: 'API + webhooks + integrations' }
   ];
 
   const useCases = [
@@ -109,9 +109,9 @@ const TimingoFlow = () => {
 
   const results = [
     { stat: 'Up to 7,500 Leads/Month', desc: 'Capture and manage thousands of leads automatically' },
-    { stat: 'AI-Assisted Messaging', desc: 'Up to 300 personalized messages per day' },
-    { stat: 'Smart Organization', desc: 'Kanban boards, pipelines, and lead tracking' },
-    { stat: 'Automated Follow-ups', desc: 'Never miss a lead with smart reminders' }
+    { stat: '700 AI Prompt Credits', desc: 'Powerful AI-driven workflows and automation' },
+    { stat: 'Unlimited AI Chats', desc: 'Conversational AI for lead qualification' },
+    { stat: 'Advanced Automation', desc: 'Multi-step funnels and smart routing' }
   ];
 
   const pricingTiers = [
@@ -125,17 +125,19 @@ const TimingoFlow = () => {
         'Up to 50 leads/day',
         'Up to 1,500 leads/month',
         'Up to 1,500 stored leads',
+        '50 AI prompt credits/month',
+        '20 AI chats/month',
+        '5 saved workflows',
         'Up to 30 AI-assisted messages/day',
-        'Up to 5 pipelines (folders)',
-        'Lead capture + basic qualification',
-        'Basic booking & inquiry flow',
-        'Kanban pipeline board',
-        'Lead history & reminders',
-        'Event tracking',
-        'Pop-up capture forms',
-        'Basic analytics dashboard'
+        'Multi-channel outreach',
+        'API access',
+        'Analytics dashboard (standard)',
+        'Up to 5 pipelines',
+        'Basic qualification + booking',
+        'Kanban board',
+        'Pop-up capture'
       ],
-      outcome: 'Capture and manage leads efficiently with essential AI support.',
+      outcome: 'Run simple AI-powered lead generation and outreach.',
       highlighted: false
     },
     {
@@ -149,18 +151,20 @@ const TimingoFlow = () => {
         'Up to 120 leads/day',
         'Up to 3,500 leads/month',
         'Up to 5,000 stored leads',
+        '250 AI prompt credits/month',
+        '100 AI chats/month',
+        '20 saved workflows',
         'Up to 120 AI-assisted messages/day',
-        'Up to 15 pipelines (folders)',
-        'Advanced qualification flows',
-        'Lead filtering & smart routing',
-        'Automated follow-up system',
-        'Kanban pipeline board',
+        'Multi-channel outreach',
+        'API access',
         'Full analytics dashboard',
-        'Smart reminders',
-        'Event tracking',
-        'Pop-up + embedded capture forms'
+        'Up to 15 pipelines',
+        'Advanced qualification',
+        'Smart routing',
+        'Automated follow-ups',
+        'Embedded + pop-up capture'
       ],
-      outcome: 'Generate and convert more leads with automation and smarter workflows.',
+      outcome: 'Automate and scale lead generation with AI workflows.',
       highlighted: true
     },
     {
@@ -173,19 +177,65 @@ const TimingoFlow = () => {
         'Up to 250 leads/day',
         'Up to 7,500 leads/month',
         'Up to 15,000 stored leads',
+        '700 AI prompt credits/month',
+        'Unlimited AI chats',
+        'Unlimited workflows',
         'Up to 300 AI-assisted messages/day',
-        'Unlimited pipelines',
-        'Multi-step conversion funnels',
-        'Advanced automation & routing',
-        'Fully optimized client journey',
+        'Multi-channel outreach',
+        'API access',
         'Advanced analytics & reporting',
-        'Smart reminders + scheduling',
-        'Event tracking',
-        'Pop-up + embedded + API capture',
+        'Unlimited pipelines',
+        'Multi-step funnels',
+        'Advanced automation + routing',
+        'Full client journey optimization',
+        'API + webhooks + integrations',
         'Priority support'
       ],
-      outcome: 'Scale lead generation and conversions with full automation and maximum capacity.',
+      outcome: 'Run fully automated, high-volume AI lead generation systems.',
       highlighted: false
+    }
+  ];
+
+  const addOns = [
+    {
+      category: 'Extra AI Prompt Credits',
+      description: 'Your #1 revenue driver - essential if your AI is doing the heavy lifting',
+      options: [
+        { amount: '+100 prompts', price: '$29' },
+        { amount: '+300 prompts', price: '$79' },
+        { amount: '+1,000 prompts', price: '$199' }
+      ]
+    },
+    {
+      category: 'Extra AI Sessions (Chats)',
+      description: 'Important for users running multiple campaigns',
+      options: [
+        { amount: '+50 AI sessions', price: '$19' },
+        { amount: '+200 AI sessions', price: '$59' }
+      ]
+    },
+    {
+      category: 'Lead Boost (Volume Add-on)',
+      description: 'For agencies and heavy users needing more lead capacity',
+      options: [
+        { amount: '+1,000 leads/month', price: '$49' },
+        { amount: '+5,000 leads/month', price: '$199' }
+      ]
+    },
+    {
+      category: 'Email Sending / Outreach Credits',
+      description: 'More outreach = more results. Direct value alignment.',
+      options: [
+        { amount: '+1,000 emails', price: '$29' },
+        { amount: '+5,000 emails', price: '$99' }
+      ]
+    },
+    {
+      category: 'Advanced Automation Pack',
+      description: 'Unlock complex workflows, conditional logic, and deeper routing rules',
+      options: [
+        { amount: 'Full automation suite', price: '$99/month' }
+      ]
     }
   ];
 
@@ -478,7 +528,7 @@ const TimingoFlow = () => {
               <p className="text-gray-600">Core features available across all tiers</p>
             </div>
             <ul className="grid md:grid-cols-2 gap-3 mb-6">
-              {['Kanban board management', 'Lead capture & qualification', 'Analytics & tracking', 'Event tracking', 'AI-assisted messaging', 'Pop-up capture forms'].map((item, idx) => (
+              {['Kanban board management', 'Lead capture & qualification', 'Analytics & tracking', 'Multi-channel outreach', 'AI-assisted messaging', 'API access'].map((item, idx) => (
                 <li key={idx} className="flex items-center gap-2">
                   <Check className="w-5 h-5 text-green-500" />
                   <span className="text-gray-700">{item}</span>
@@ -487,11 +537,29 @@ const TimingoFlow = () => {
             </ul>
           </div>
 
-          {/* Add-ons */}
-          <div className="animate-on-scroll mt-8 text-center space-y-2">
-            <p className="text-gray-600">
-              <strong>Need more?</strong> Custom lead limits available • Enterprise solutions • API access • White-label options
-            </p>
+          {/* Add-ons Section */}
+          <div className="animate-on-scroll mt-16">
+            <div className="text-center mb-12">
+              <h3 className="text-3xl font-bold text-gray-900 mb-3">Power-Ups & Add-ons</h3>
+              <p className="text-lg text-gray-600">Scale beyond your plan limits with flexible add-ons</p>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+              {addOns.map((addon, idx) => (
+                <div key={idx} className="bg-white rounded-xl p-6 border-2 border-gray-200 hover:border-purple-400 transition-all">
+                  <h4 className="text-lg font-bold text-gray-900 mb-2">{addon.category}</h4>
+                  <p className="text-sm text-gray-600 mb-4">{addon.description}</p>
+                  <div className="space-y-2">
+                    {addon.options.map((option, oIdx) => (
+                      <div key={oIdx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <span className="text-sm font-medium text-gray-700">{option.amount}</span>
+                        <span className="text-sm font-bold text-purple-600">{option.price}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Positioning Line */}
