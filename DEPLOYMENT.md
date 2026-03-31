@@ -1,5 +1,28 @@
 # Email Setup & Deployment Guide
 
+## 🚨 CRITICAL: Fix 500 Errors
+
+If you're seeing **500 errors** on `/api/demo`, `/api/contact`, or `/api/subscribe`, it means:
+
+### ❌ Problem: Environment Variable Not Set
+
+**YOU MUST ADD THE API KEY TO VERCEL:**
+
+1. Go to https://vercel.com/your-project/settings/environment-variables
+2. Click **Add New**
+3. Enter:
+   - **Key:** `RESEND_API_KEY`
+   - **Value:** `re_JRn1Ku9c_65t4wYW4stBfhNKrjxGHksxb`
+   - **Environments:** Check ALL (Production, Preview, Development)
+4. Click **Save**
+5. **REQUIRED:** Go to **Deployments** tab → Click **Redeploy** on latest deployment
+
+### ❌ Problem: 404 Errors on Page Reload
+
+**FIXED:** Updated `vercel.json` to handle React Router properly. After your next deployment, reloading pages will work.
+
+---
+
 ## ✅ Email Configuration Completed
 
 Your website now uses **Resend** for all email sending with `team@timingotech.com`.
