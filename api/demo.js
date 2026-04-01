@@ -15,13 +15,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Check for API key
-  if (!process.env.RESEND_API_KEY) {
-    console.error('RESEND_API_KEY is not set');
-    return res.status(500).json({ error: 'Server configuration error' });
-  }
-
-  const resend = new Resend(process.env.RESEND_API_KEY);
+  const resend = new Resend('re_JRn1Ku9c_65t4wYW4stBfhNKrjxGHksxb');
 
   const { name, email, phone, industry } = req.body || {};
 
