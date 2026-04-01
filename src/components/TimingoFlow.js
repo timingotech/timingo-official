@@ -7,6 +7,7 @@ const TimingoFlow = () => {
   const [animateOnLoad, setAnimateOnLoad] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null); // 'success' | 'error' | null
+  const [billingPeriod, setBillingPeriod] = useState('monthly'); // 'monthly' | 'yearly'
   const demoForm = useRef();
 
   useEffect(() => {
@@ -117,8 +118,8 @@ const TimingoFlow = () => {
     {
       name: 'Starter',
       subtitle: 'Best for solo agencies and consultants',
-      price: '$99',
-      period: '/month',
+      monthlyPrice: 99,
+      yearlyPrice: 891, // $99 × 12 × 0.75 (25% discount)
       description: 'Start building a consistent client pipeline.',
       features: [
         'Up to 50 leads/day',
@@ -142,8 +143,8 @@ const TimingoFlow = () => {
     {
       name: 'Growth',
       subtitle: 'For agencies scaling to 6-7 figures',
-      price: '$249',
-      period: '/month',
+      monthlyPrice: 249,
+      yearlyPrice: 2241, // $249 × 12 × 0.75 (25% discount)
       badge: 'Most Popular',
       description: 'Scale your agency with more clients and automation.',
       features: [
@@ -169,8 +170,8 @@ const TimingoFlow = () => {
     {
       name: 'Pro',
       subtitle: 'For multi-6-figure and 7-figure agencies',
-      price: '$499',
-      period: '/month',
+      monthlyPrice: 499,
+      yearlyPrice: 4491, // $499 × 12 × 0.75 (25% discount)
       description: 'Enterprise-grade client acquisition for growing agencies.',
       features: [
         'Up to 250 leads/day',
@@ -194,6 +195,22 @@ const TimingoFlow = () => {
       highlighted: false
     }
   ];
+
+  // Helper function to get price display
+  const getPriceDisplay = (tier) => {
+    if (billingPeriod === 'yearly') {
+      return {
+        price: `$${tier.yearlyPrice}`,
+        period: '/year',
+        savings: `Save $${(tier.monthlyPrice * 12 - tier.yearlyPrice).toFixed(0)}/year`
+      };
+    }
+    return {
+      price: `$${tier.monthlyPrice}`,
+      period: '/month',
+      savings: null
+    };
+  };
 
   const addOns = [
     {
@@ -755,64 +772,109 @@ const TimingoFlow = () => {
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-4 animate-on-scroll">
             <p className="text-2xl font-semibold text-purple-600 mb-8">
-              One client can easily cover your monthly plan.
+              One client can easily cover your {billingPeriod === 'monthly' ? 'monthly' : 'yearly'} plan.
             </p>
           </div>
           
-          <div className="text-center mb-16 animate-on-scroll">
+          <div className="text-center mb-8 animate-on-scroll">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Simple Monthly Pricing
+              Simple {billingPeriod === 'monthly' ? 'Monthly' : 'Yearly'} Pricing
             </h2>
-            <p className="text-xl text-gray-600">Choose the plan that fits your agency size. Cancel anytime.</p>
+            <p className="text-xl text-gray-600 mb-8">Choose the plan that fits your agency size. Cancel anytime.</p>
+            
+            {/* Billing Toggle */}
+            <div className="inline-flex items-center bg-white rounded-lg p-1 border-2 border-gray-200 shadow-sm">
+              <button
+                onClick={() => setBillingPeriod('monthly')}
+                className={`px-6 py-2 rounded-md font-semibold transition-all duration-300 ${
+                  billingPeriod === 'monthly'
+                    ? 'flow-gradient text-white shadow-md'
+                    : 'text-gray-700 hover:text-gray-900'
+                }`}
+              >
+                Monthly
+              </button>
+              <button
+                onClick={() => setBillingPeriod('yearly')}
+                className={`px-6 py-2 rounded-md font-semibold transition-all duration-300 flex items-center gap-2 ${
+                  billingPeriod === 'yearly'
+                    ? 'flow-gradient text-white shadow-md'
+                    : 'text-gray-700 hover:text-gray-900'
+                }`}
+              >
+                Yearly
+                <span className="text-xs bg-green-500 text-white px-2 py-0.5 rounded-full">
+                  Save 25%
+                </span>
+              </button>
+            </div>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 mb-12">
-            {pricingTiers.map((tier, idx) => (
-              <div key={idx} className={`animate-on-scroll bg-white rounded-2xl p-8 border-2 ${tier.highlighted ? 'border-purple-500 shadow-2xl scale-105' : 'border-gray-200'} relative`}>
-                {tier.badge && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <span className="px-4 py-1 bg-purple-500 text-white text-sm font-semibold rounded-full">
-                      {tier.badge}
-                    </span>
+            {pricingTiers.map((tier, idx) => {
+              const priceInfo = getPriceDisplay(tier);
+              return (
+                <div key={idx} className={`animate-on-scroll bg-white rounded-2xl p-8 border-2 ${tier.highlighted ? 'border-purple-500 shadow-2xl scale-105' : 'border-gray-200'} relative`}>
+                  {tier.badge && (
+                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                      <span className="px-4 py-1 bg-purple-500 text-white text-sm font-semibold rounded-full">
+                        {tier.badge}
+                      </span>
+                    </div>
+                  )}
+                  
+                  <div className="text-center mb-6">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-1">{tier.name}</h3>
+                    <p className="text-gray-600 text-sm mb-4">{tier.subtitle}</p>
+                    <div className="text-5xl font-bold text-gray-900 mb-2">
+                      {priceInfo.price}
+                      <span className="text-lg font-normal text-gray-600"> {priceInfo.period}</span>
+                    </div>
+                    {priceInfo.savings && (
+                      <p className="text-green-600 font-semibold text-sm mb-2">{priceInfo.savings}</p>
+                    )}
+                    <p className="text-gray-600 text-sm">{tier.description}</p>
                   </div>
-                )}
-                
-                <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-1">{tier.name}</h3>
-                  <p className="text-gray-600 text-sm mb-4">{tier.subtitle}</p>
-                  <div className="text-5xl font-bold text-gray-900 mb-2">
-                    {tier.price}
-                    <span className="text-lg font-normal text-gray-600"> {tier.period}</span>
+
+                  <ul className="space-y-3 mb-6">
+                    {tier.features.map((feature, fIdx) => (
+                      <li key={fIdx} className="flex items-start gap-2">
+                        <Check className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                        <span className="text-gray-700 text-sm">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <div className="bg-purple-50 rounded-lg p-4 mb-6">
+                    <p className="text-sm font-semibold text-purple-900 mb-1">Outcome:</p>
+                    <p className="text-sm text-gray-700">{tier.outcome}</p>
                   </div>
-                  <p className="text-gray-600 text-sm">{tier.description}</p>
+
+                  <button 
+                    onClick={scrollToDemo}
+                    className={`w-full py-3 rounded-lg font-semibold transition-all duration-300 ${
+                      tier.highlighted 
+                        ? 'flow-gradient text-white hover:shadow-lg' 
+                        : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                    }`}
+                  >
+                    Get Clients Now
+                  </button>
                 </div>
+              );
+            })}
+          </div>
 
-                <ul className="space-y-3 mb-6">
-                  {tier.features.map((feature, fIdx) => (
-                    <li key={fIdx} className="flex items-start gap-2">
-                      <Check className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span className="text-gray-700 text-sm">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="bg-purple-50 rounded-lg p-4 mb-6">
-                  <p className="text-sm font-semibold text-purple-900 mb-1">Outcome:</p>
-                  <p className="text-sm text-gray-700">{tier.outcome}</p>
-                </div>
-
-                <button 
-                  onClick={scrollToDemo}
-                  className={`w-full py-3 rounded-lg font-semibold transition-all duration-300 ${
-                    tier.highlighted 
-                      ? 'flow-gradient text-white hover:shadow-lg' 
-                      : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
-                  }`}
-                >
-                  Get Clients Now
-                </button>
-              </div>
-            ))}
+          {/* Referral Commission Note */}
+          <div className="animate-on-scroll text-center mb-8">
+            <div className="inline-block bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-200 rounded-xl px-6 py-4">
+              <p className="text-lg font-semibold text-gray-900 mb-1">
+                💰 Earn with Referrals
+              </p>
+              <p className="text-gray-700">
+                Refer clients and earn <span className="font-bold text-green-600">20% commission</span> on every purchase
+              </p>
+            </div>
           </div>
 
           {/* What's Included */}
