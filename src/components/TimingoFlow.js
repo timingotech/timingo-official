@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
 import axios from 'axios';
-import { ArrowRight, Check, X, Zap, Target, Users, TrendingUp, Clock, Shield, Sparkles, Calendar, MessageSquare, Filter, BarChart3, ChevronRight, Loader2, CheckCircle } from 'lucide-react';
+import { ArrowRight, Check, X, Target, Users, TrendingUp, Clock, Shield, Calendar, MessageSquare, BarChart3, ChevronRight, Loader2, CheckCircle } from 'lucide-react';
 
 const TimingoFlow = () => {
   const [animateOnLoad, setAnimateOnLoad] = useState(false);
@@ -68,59 +68,58 @@ const TimingoFlow = () => {
   const howItWorks = [
     {
       icon: <Target className="w-10 h-10" />,
-      title: 'Capture',
-      description: 'AI scrapes 1000+ qualified leads from your target market in minutes'
+      title: 'Step 1',
+      description: 'We find businesses already needing your service'
     },
     {
-      icon: <Filter className="w-10 h-10" />,
-      title: 'Qualify',
-      description: 'AI filters and scores leads automatically based on your ideal client profile'
+      icon: <MessageSquare className="w-10 h-10" />,
+      title: 'Step 2',
+      description: 'We contact them with personalized outreach'
     },
     {
-      icon: <Zap className="w-10 h-10" />,
-      title: 'Convert',
-      description: 'AI crafts personalized messages that get responses and book meetings'
+      icon: <Users className="w-10 h-10" />,
+      title: 'Step 3',
+      description: 'They respond and book with you'
     },
     {
-      icon: <Sparkles className="w-10 h-10" />,
-      title: 'Automate',
-      description: 'AI sends personalized messages to thousands of leads automatically—no manual work'
+      icon: <Check className="w-10 h-10" />,
+      title: 'Step 4',
+      description: 'You close the deal'
     }
   ];
 
   const features = [
-    { icon: <Calendar className="w-6 h-6" />, text: 'Up to 7,500 leads/month' },
-    { icon: <Filter className="w-6 h-6" />, text: 'AI prompt credits for workflows' },
-    { icon: <MessageSquare className="w-6 h-6" />, text: 'Unlimited AI chat sessions' },
-    { icon: <Users className="w-6 h-6" />, text: 'Multi-channel outreach' },
-    { icon: <Clock className="w-6 h-6" />, text: 'Saved workflows & automation' },
-    { icon: <TrendingUp className="w-6 h-6" />, text: 'API + webhooks + integrations' }
+    { icon: <Users className="w-6 h-6" />, text: 'Find qualified clients automatically' },
+    { icon: <MessageSquare className="w-6 h-6" />, text: 'Personalized outreach at scale' },
+    { icon: <Calendar className="w-6 h-6" />, text: 'Book meetings on autopilot' },
+    { icon: <TrendingUp className="w-6 h-6" />, text: 'Track results & ROI' },
+    { icon: <Clock className="w-6 h-6" />, text: 'Consistent client pipeline' },
+    { icon: <Check className="w-6 h-6" />, text: 'Simple setup, no complexity' }
   ];
 
   const useCases = [
-    'Freelancers',
-    'Small Businesses',
-    'Veterinary Clinics',
-    'Healthcare Providers',
-    'Consultants & Coaches',
+    'Marketing Agencies',
+    'Web Design Agencies',
+    'SEO Agencies',
+    'Consultants',
     'Service Businesses',
-    'Agencies'
+    'Growth Teams'
   ];
 
   const results = [
-    { stat: 'Up to 7,500 Leads/Month', desc: 'Capture and manage thousands of leads automatically' },
-    { stat: '700 AI Prompt Credits', desc: 'Powerful AI-driven workflows and automation' },
-    { stat: 'Unlimited AI Chats', desc: 'Conversational AI for lead qualification' },
-    { stat: 'Advanced Automation', desc: 'Multi-step funnels and smart routing' }
+    { stat: '10-30 Clients/Month', desc: 'Consistent new business every month' },
+    { stat: 'Qualified Leads', desc: 'Businesses already looking for your service' },
+    { stat: 'Personalized Outreach', desc: 'Messages that get responses, not ignored' },
+    { stat: 'Automated Pipeline', desc: 'System runs while you focus on closing' }
   ];
 
   const pricingTiers = [
     {
       name: 'Starter',
-      subtitle: 'Best for individuals and small teams getting started',
+      subtitle: 'Best for solo agencies and consultants',
       price: '$99',
       period: '/month',
-      description: 'Perfect for getting started with lead management and AI assistance.',
+      description: 'Start building a consistent client pipeline.',
       features: [
         'Up to 50 leads/day',
         'Up to 1,500 leads/month',
@@ -137,16 +136,16 @@ const TimingoFlow = () => {
         'Kanban board',
         'Pop-up capture'
       ],
-      outcome: 'Run simple AI-powered lead generation and outreach.',
+      outcome: 'Get your first 5-10 qualified clients per month.',
       highlighted: false
     },
     {
       name: 'Growth',
-      subtitle: 'For businesses scaling lead generation',
+      subtitle: 'For agencies scaling to 6-7 figures',
       price: '$249',
       period: '/month',
       badge: 'Most Popular',
-      description: 'Scale your lead generation with more volume and advanced features.',
+      description: 'Scale your agency with more clients and automation.',
       features: [
         'Up to 120 leads/day',
         'Up to 3,500 leads/month',
@@ -164,15 +163,15 @@ const TimingoFlow = () => {
         'Automated follow-ups',
         'Embedded + pop-up capture'
       ],
-      outcome: 'Automate and scale lead generation with AI workflows.',
+      outcome: 'Get 15-20 qualified clients per month consistently.',
       highlighted: true
     },
     {
       name: 'Pro',
-      subtitle: 'For high-growth teams and advanced operations',
+      subtitle: 'For multi-6-figure and 7-figure agencies',
       price: '$499',
       period: '/month',
-      description: 'Enterprise-grade features for teams that need maximum capacity.',
+      description: 'Enterprise-grade client acquisition for growing agencies.',
       features: [
         'Up to 250 leads/day',
         'Up to 7,500 leads/month',
@@ -191,7 +190,7 @@ const TimingoFlow = () => {
         'API + webhooks + integrations',
         'Priority support'
       ],
-      outcome: 'Run fully automated, high-volume AI lead generation systems.',
+      outcome: 'Get 25-30+ qualified clients per month at scale.',
       highlighted: false
     }
   ];
@@ -242,9 +241,9 @@ const TimingoFlow = () => {
   return (
     <div className="min-h-screen bg-white">
       <Helmet>
-        <title>TimingoFlow - Get 1000+ Leads & AI-Powered Outreach in 5 Clicks | Timingotech</title>
-        <meta name="description" content="AI-powered lead generation and outreach for freelancers and small businesses. Get 1000+ qualified leads, send personalized messages automatically. Setup in under 5 minutes." />
-        <meta name="keywords" content="AI lead generation, automated outreach, personalized messages, lead scraping, freelancer leads, small business marketing, TimingoFlow" />
+        <title>TimingoFlow - Get 10-30 Qualified Clients Every Month | Client Acquisition for Agencies</title>
+        <meta name="description" content="Get consistent clients for your agency. We find businesses already needing your service, reach out with personalized messages, and book meetings automatically. Built for marketing, web design, and consulting agencies." />
+        <meta name="keywords" content="client acquisition, agency clients, marketing agency leads, web design clients, consulting clients, automated client generation, agency growth, get clients" />
         <link rel="canonical" href="https://www.timingotech.com/timingoflow" />
       </Helmet>
 
@@ -279,26 +278,44 @@ const TimingoFlow = () => {
               By Timingotech
             </div>
             <h1 className="text-5xl md:text-7xl font-bold text-white leading-tight">
-              Get Leads. Send AI-Powered Messages.<br />Book Clients. All in 5 Clicks.
+              Get 10–30 Qualified Clients<br />Every Month Without Cold Outreach
             </h1>
             <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto leading-relaxed">
-              AI-powered lead generation and automated outreach system. Set up in under 5 minutes. Get 1000+ qualified leads, send personalized messages, and book clients—all on autopilot.
+              We find, contact, and convert businesses already needing your service — so you don't have to chase leads.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8">
               <button 
                 onClick={scrollToDemo}
                 className="group px-8 py-4 bg-white text-purple-600 rounded-lg font-semibold text-lg hover:bg-gray-50 transition-all duration-300 flex items-center gap-2 shadow-xl hover:shadow-2xl transform hover:scale-105"
               >
-                Book a Demo
+                See How You Get Clients
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
               <button 
                 onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
                 className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white rounded-lg font-semibold text-lg hover:bg-white/20 transition-all duration-300 border border-white/30"
               >
-                View How It Works
+                Watch 5-Min Demo
               </button>
             </div>
+            <p className="text-white/80 text-sm mt-4">
+              No pressure. See exactly how it works for your agency.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Try It Risk-Free Section */}
+      <section className="py-16 bg-white border-b border-gray-200">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <div className="animate-on-scroll">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Try It Risk-Free
+            </h2>
+            <p className="text-lg text-gray-700 leading-relaxed max-w-2xl mx-auto">
+              We'll show you exactly how this would bring in clients for your agency before you commit to anything.
+              If it makes sense, we continue. If not, no worries.
+            </p>
           </div>
         </div>
       </section>
@@ -308,19 +325,19 @@ const TimingoFlow = () => {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16 animate-on-scroll">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Freelancers & Small Businesses Are Stuck
+              Most Agencies Struggle to Get Consistent Clients
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Spending hours on manual outreach with little to show for it
+              The same problems keep agencies stuck
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {[
-              { icon: <X className="w-6 h-6" />, title: 'Manual lead hunting', desc: 'Spending hours finding leads on LinkedIn and Google with no system' },
-              { icon: <X className="w-6 h-6" />, title: 'Copy-paste messages', desc: 'Sending the same generic message to everyone and getting ignored' },
-              { icon: <X className="w-6 h-6" />, title: 'No follow-up system', desc: 'Forgetting to follow up and losing warm leads constantly' },
-              { icon: <X className="w-6 h-6" />, title: 'Low response rates', desc: 'Getting 1-2% response rates because outreach isn\'t personalized' }
+              { icon: <X className="w-6 h-6" />, title: 'Spending hours finding leads manually', desc: 'No system, just endless searching' },
+              { icon: <X className="w-6 h-6" />, title: 'Sending messages that get ignored', desc: 'Generic outreach that doesn\'t convert' },
+              { icon: <X className="w-6 h-6" />, title: 'No consistent pipeline of new clients', desc: 'Feast or famine revenue cycles' },
+              { icon: <X className="w-6 h-6" />, title: 'Losing deals due to poor follow-up', desc: 'Warm leads go cold from inconsistent contact' }
             ].map((problem, idx) => (
               <div key={idx} className="animate-on-scroll bg-white p-6 rounded-xl border border-red-100 hover:border-red-200 transition-all">
                 <div className="flex items-start gap-4">
@@ -341,29 +358,29 @@ const TimingoFlow = () => {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16 animate-on-scroll">
             <div className="inline-block px-4 py-2 flow-gradient-soft rounded-full text-purple-600 text-sm font-medium mb-4">
-              AI-Powered Solution
+              The Solution
             </div>
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              TimingoFlow: AI That Gets You Clients
+              How You Get Clients Consistently
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Set up in 5 clicks, under 5 minutes. Our AI scrapes thousands of qualified leads, writes personalized messages, and sends them automatically. You just watch the bookings roll in.
+              This system finds businesses already looking for your service, reaches out with personalized messages, and turns them into booked meetings — automatically.
             </p>
           </div>
 
           <div className="animate-on-scroll bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-8 md:p-12 border border-purple-100">
             <div className="grid md:grid-cols-3 gap-8">
               <div className="text-center">
-                <div className="text-5xl font-bold text-purple-600 mb-2">3,000+</div>
-                <div className="text-gray-700">Leads per month (Growth plan)</div>
+                <div className="text-5xl font-bold text-purple-600 mb-2">10-30</div>
+                <div className="text-gray-700">Qualified clients per month</div>
               </div>
               <div className="text-center">
-                <div className="text-5xl font-bold text-purple-600 mb-2">AI-Powered</div>
-                <div className="text-gray-700">Automated messaging & qualification</div>
+                <div className="text-5xl font-bold text-purple-600 mb-2">Personalized</div>
+                <div className="text-gray-700">Outreach that actually gets responses</div>
               </div>
               <div className="text-center">
-                <div className="text-5xl font-bold text-purple-600 mb-2">5 min</div>
-                <div className="text-gray-700">Quick setup, instant results</div>
+                <div className="text-5xl font-bold text-purple-600 mb-2">Automated</div>
+                <div className="text-gray-700">Runs on autopilot while you close</div>
               </div>
             </div>
           </div>
@@ -375,9 +392,9 @@ const TimingoFlow = () => {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16 animate-on-scroll">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              How It Works: 4 Steps, 5 Clicks, Under 5 Minutes
+              How It Works
             </h2>
-            <p className="text-xl text-gray-600">AI handles everything from lead generation to personalized outreach</p>
+            <p className="text-xl text-gray-600">Simple. Believable. Results-driven.</p>
           </div>
 
           <div className="grid md:grid-cols-4 gap-6">
@@ -401,9 +418,9 @@ const TimingoFlow = () => {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16 animate-on-scroll">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              What You Get
+              What This Gets You
             </h2>
-            <p className="text-xl text-gray-600">Everything you need to convert more visitors into clients</p>
+            <p className="text-xl text-gray-600">Results that matter for your agency</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
@@ -426,9 +443,9 @@ const TimingoFlow = () => {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16 animate-on-scroll">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Built For Freelancers, Small Businesses & Service Providers
+              Built For Agencies That Want More Clients
             </h2>
-            <p className="text-xl text-gray-600">Trusted by professionals who need clients, not complexity</p>
+            <p className="text-xl text-gray-600">Trusted by agencies that need consistent growth</p>
           </div>
 
           <div className="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto animate-on-scroll">
@@ -441,14 +458,81 @@ const TimingoFlow = () => {
         </div>
       </section>
 
+      {/* Example Results Section */}
+      <section className="py-20 bg-gradient-to-br from-purple-50 to-blue-50">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-16 animate-on-scroll">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              Example Results
+            </h2>
+            <p className="text-xl text-gray-600">Here's what this system can generate:</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Example Leads */}
+            <div className="animate-on-scroll bg-white rounded-xl p-6 border border-purple-200">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Sample Leads</h3>
+              <div className="space-y-3">
+                <div className="p-3 bg-gray-50 rounded">
+                  <p className="font-semibold text-gray-900">Acme Marketing Co.</p>
+                  <p className="text-sm text-gray-600">Looking for web design services</p>
+                  <p className="text-xs text-purple-600 mt-1">Score: 92/100</p>
+                </div>
+                <div className="p-3 bg-gray-50 rounded">
+                  <p className="font-semibold text-gray-900">Growth Digital Ltd.</p>
+                  <p className="text-sm text-gray-600">Needs SEO consultant</p>
+                  <p className="text-xs text-purple-600 mt-1">Score: 88/100</p>
+                </div>
+                <div className="p-3 bg-gray-50 rounded">
+                  <p className="font-semibold text-gray-900">Tech Solutions Inc.</p>
+                  <p className="text-sm text-gray-600">Hiring marketing agency</p>
+                  <p className="text-xs text-purple-600 mt-1">Score: 95/100</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Sample Outreach */}
+            <div className="animate-on-scroll bg-white rounded-xl p-6 border border-purple-200">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Sample Message</h3>
+              <div className="p-4 bg-gray-50 rounded text-sm text-gray-700 leading-relaxed">
+                <p className="mb-2">Hi Sarah,</p>
+                <p className="mb-2">
+                  Noticed you're looking for SEO help for Growth Digital. We specialize in helping B2B companies like yours rank for competitive keywords.
+                </p>
+                <p className="mb-2">
+                  Would love to show you a quick case study from a similar client we helped — are you free for 15 min this week?
+                </p>
+                <p>Best,<br />Alex</p>
+              </div>
+            </div>
+
+            {/* Example Response */}
+            <div className="animate-on-scroll bg-white rounded-xl p-6 border border-purple-200">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Typical Response</h3>
+              <div className="p-4 bg-green-50 rounded text-sm text-gray-700 leading-relaxed border border-green-200">
+                <p className="mb-2 font-semibold text-green-800">✓ Positive Response</p>
+                <p className="mb-2">
+                  "Hi Alex, yes we're actively looking for SEO support. Would Thursday at 2pm work for a quick call?"
+                </p>
+                <p className="text-xs text-gray-600 mt-3">→ Meeting booked</p>
+              </div>
+              <div className="mt-3 p-3 bg-purple-50 rounded text-xs text-purple-900">
+                <p className="font-semibold">Conversion Rate: 15-25%</p>
+                <p className="text-purple-700">Typical response rate from qualified leads</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Results */}
       <section className="py-20 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16 animate-on-scroll">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              The Results You'll See
+              What You Can Expect
             </h2>
-            <p className="text-xl text-gray-600">Real outcomes that matter to your business</p>
+            <p className="text-xl text-gray-600">Real outcomes for your agency</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -465,11 +549,17 @@ const TimingoFlow = () => {
       {/* Pricing Section */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-4 animate-on-scroll">
+            <p className="text-2xl font-semibold text-purple-600 mb-8">
+              One client can easily cover your monthly plan.
+            </p>
+          </div>
+          
           <div className="text-center mb-16 animate-on-scroll">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
               Simple Monthly Pricing
             </h2>
-            <p className="text-xl text-gray-600">Choose the plan that fits your lead volume. Cancel anytime.</p>
+            <p className="text-xl text-gray-600">Choose the plan that fits your agency size. Cancel anytime.</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 mb-12">
@@ -515,7 +605,7 @@ const TimingoFlow = () => {
                       : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
                   }`}
                 >
-                  Get Started
+                  Get Clients Now
                 </button>
               </div>
             ))}
@@ -525,10 +615,10 @@ const TimingoFlow = () => {
           <div className="animate-on-scroll max-w-3xl mx-auto bg-white rounded-2xl p-8 border border-gray-200">
             <div className="text-center mb-6">
               <h3 className="text-2xl font-bold text-gray-900 mb-2">Every Plan Includes</h3>
-              <p className="text-gray-600">Core features available across all tiers</p>
+              <p className="text-gray-600">Core features for consistent client acquisition</p>
             </div>
             <ul className="grid md:grid-cols-2 gap-3 mb-6">
-              {['Kanban board management', 'Lead capture & qualification', 'Analytics & tracking', 'Multi-channel outreach', 'AI-assisted messaging', 'API access'].map((item, idx) => (
+              {['Find qualified clients', 'Personalized outreach', 'Meeting booking', 'Performance tracking', 'Multi-channel contact', 'Simple dashboard'].map((item, idx) => (
                 <li key={idx} className="flex items-center gap-2">
                   <Check className="w-5 h-5 text-green-500" />
                   <span className="text-gray-700">{item}</span>
@@ -568,7 +658,7 @@ const TimingoFlow = () => {
               Simple monthly subscription. Cancel anytime.
             </p>
             <p className="text-gray-600">
-              Start capturing and converting leads with AI-powered automation today.
+              Start getting consistent clients for your agency today.
             </p>
           </div>
         </div>
@@ -579,10 +669,10 @@ const TimingoFlow = () => {
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center text-white space-y-8 animate-on-scroll">
             <h2 className="text-4xl md:text-5xl font-bold">
-              Ready to Manage Leads Like a Pro?
+              Ready to Get More Clients Consistently?
             </h2>
             <p className="text-xl text-white/90">
-              Book a quick 10-minute demo. See how TimingoFlow helps you capture, qualify, and convert leads with AI-powered automation.
+              See exactly how this will work for your agency in 5 minutes.
             </p>
             
             <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 max-w-md mx-auto border border-white/20">
@@ -625,7 +715,7 @@ const TimingoFlow = () => {
                     </>
                   ) : (
                     <>
-                      Book 10-Minute Demo
+                      See How It Works For You
                       <ChevronRight className="w-5 h-5" />
                     </>
                   )}
@@ -650,7 +740,7 @@ const TimingoFlow = () => {
             </div>
 
             <p className="text-white/80 text-sm">
-              No pressure. No hard sell. Just see how AI can 10x your outreach in 5 minutes.
+              No pressure. Just see how this would bring in clients for your agency.
             </p>
           </div>
         </div>
@@ -661,7 +751,7 @@ const TimingoFlow = () => {
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center space-y-8 animate-on-scroll">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900">
-              AI-Powered. Simple. Built For Results.
+              Simple. Effective. Built For Results.
             </h2>
             
             <div className="grid md:grid-cols-3 gap-8 pt-8">
@@ -670,29 +760,29 @@ const TimingoFlow = () => {
                   <Shield className="w-8 h-8 text-purple-600" />
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-2">No Complex Setup</h3>
-                <p className="text-gray-600">5 clicks, under 5 minutes. That's it.</p>
+                <p className="text-gray-600">Simple onboarding. Start getting clients fast.</p>
               </div>
               
               <div className="text-center">
                 <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Target className="w-8 h-8 text-purple-600" />
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-2">AI Does The Work</h3>
-                <p className="text-gray-600">Automated lead gen and personalized outreach</p>
+                <h3 className="font-semibold text-gray-900 mb-2">Qualified Leads Only</h3>
+                <p className="text-gray-600">Businesses already looking for your service</p>
               </div>
               
               <div className="text-center">
                 <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                   <BarChart3 className="w-8 h-8 text-purple-600" />
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-2">Built For Freelancers</h3>
-                <p className="text-gray-600">Perfect for solopreneurs and small teams</p>
+                <h3 className="font-semibold text-gray-900 mb-2">Built For Agencies</h3>
+                <p className="text-gray-600">Perfect for marketing, web design, and consulting agencies</p>
               </div>
             </div>
 
             <div className="pt-8 border-t border-gray-200">
               <p className="text-gray-600">
-                A product by <span className="font-semibold text-purple-600">Timingotech</span> — AI-powered systems that get you clients, not complexity.
+                A product by <span className="font-semibold text-purple-600">Timingotech</span> — systems that get you clients, not complexity.
               </p>
             </div>
           </div>
