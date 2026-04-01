@@ -122,7 +122,7 @@ const TimingoFlow = () => {
       name: 'Starter',
       subtitle: 'Best for solo agencies and consultants',
       monthlyPrice: 99,
-      yearlyPrice: 891, // $99 × 12 × 0.75 (25% discount)
+      yearlyPrice: 950, // $99 × 12 × 0.80 (20% discount)
       description: 'Start building a consistent client pipeline.',
       features: [
         'Up to 50 leads/day',
@@ -147,7 +147,7 @@ const TimingoFlow = () => {
       name: 'Growth',
       subtitle: 'For agencies scaling to 6-7 figures',
       monthlyPrice: 249,
-      yearlyPrice: 2241, // $249 × 12 × 0.75 (25% discount)
+      yearlyPrice: 2390, // $249 × 12 × 0.80 (20% discount)
       badge: 'Most Popular',
       description: 'Scale your agency with more clients and automation.',
       features: [
@@ -174,7 +174,7 @@ const TimingoFlow = () => {
       name: 'Pro',
       subtitle: 'For multi-6-figure and 7-figure agencies',
       monthlyPrice: 499,
-      yearlyPrice: 4491, // $499 × 12 × 0.75 (25% discount)
+      yearlyPrice: 4790, // $499 × 12 × 0.80 (20% discount)
       description: 'Enterprise-grade client acquisition for growing agencies.',
       features: [
         'Up to 250 leads/day',
@@ -673,7 +673,7 @@ const TimingoFlow = () => {
               >
                 Yearly
                 <span className="text-xs bg-green-500 text-white px-2 py-0.5 rounded-full">
-                  Save 25%
+                  Save 20%
                 </span>
               </button>
             </div>
