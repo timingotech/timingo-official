@@ -2,6 +2,9 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
 import axios from 'axios';
 import { ArrowRight, Check, X, Target, Users, TrendingUp, Clock, Shield, Calendar, MessageSquare, BarChart3, ChevronRight, Loader2, CheckCircle } from 'lucide-react';
+import Image1 from '../images/Image1.png';
+import Image2 from '../images/Image2.png';
+import Image3 from '../images/Image3.png';
 
 const TimingoFlow = () => {
   const [animateOnLoad, setAnimateOnLoad] = useState(false);
@@ -446,52 +449,11 @@ const TimingoFlow = () => {
             {/* Image 1 - Lead Generation */}
             <div className="animate-on-scroll">
               <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl border-2 border-gray-200 overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300">
-                {/* Placeholder for image1.png */}
-                <div className="bg-gradient-to-br from-purple-100 to-blue-100 p-8 min-h-[400px] flex items-center justify-center relative">
-                  <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-4xl">
-                    {/* Mock UI - Dashboard Search */}
-                    <div className="mb-4">
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="w-full bg-gray-100 rounded-lg px-4 py-3 text-gray-700 font-medium border border-gray-300">
-                          Marketing agencies in Atlanta
-                        </div>
-                        <button className="px-6 py-3 flow-gradient text-white rounded-lg font-semibold whitespace-nowrap">
-                          Search
-                        </button>
-                      </div>
-                      <div className="flex items-center gap-2 mb-4">
-                        <div className="h-2 flex-1 bg-gray-200 rounded-full overflow-hidden">
-                          <div className="h-full bg-purple-600 w-[98%]"></div>
-                        </div>
-                        <span className="text-sm font-semibold text-purple-600">49 / 50 leads found</span>
-                      </div>
-                    </div>
-                    {/* Mock leads table */}
-                    <div className="space-y-2">
-                      {[
-                        { name: 'Atlanta Digital Solutions', email: 'contact@atlantadigital.com', phone: '+1 404-555-0123', rating: '95' },
-                        { name: 'Peachtree Marketing Co.', email: 'hello@peachtreemarketing.com', phone: '+1 404-555-0456', rating: '92' },
-                        { name: 'Southern Growth Agency', email: 'info@southerngrowth.com', phone: '+1 404-555-0789', rating: '88' }
-                      ].map((lead, idx) => (
-                        <div key={idx} className="bg-gray-50 rounded-lg p-4 flex items-center justify-between hover:bg-gray-100 transition-all border border-gray-200">
-                          <div className="flex-1">
-                            <p className="font-semibold text-gray-900">{lead.name}</p>
-                            <p className="text-sm text-gray-600">{lead.email} • {lead.phone}</p>
-                          </div>
-                          <div className="text-right">
-                            <span className="inline-block px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold">
-                              Score: {lead.rating}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  {/* Image placeholder indicator */}
-                  <div className="absolute top-4 right-4 bg-purple-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                    image1.png
-                  </div>
-                </div>
+                <img 
+                  src={Image1} 
+                  alt="Lead generation dashboard showing marketing agencies in Atlanta" 
+                  className="w-full h-auto"
+                />
               </div>
               <div className="mt-6 text-center">
                 <h3 className="text-2xl font-bold text-gray-900 mb-3">Finding qualified leads in real-time</h3>
@@ -505,63 +467,11 @@ const TimingoFlow = () => {
             {/* Image 3 - AI Processing */}
             <div className="animate-on-scroll">
               <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl border-2 border-gray-200 overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300">
-                {/* Placeholder for image3.png */}
-                <div className="bg-gradient-to-br from-indigo-100 to-purple-100 p-8 min-h-[400px] flex items-center justify-center relative">
-                  <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-4xl">
-                    {/* Mock AI workflow panel */}
-                    <div className="mb-6">
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="w-3 h-3 bg-purple-600 rounded-full animate-pulse"></div>
-                        <span className="text-lg font-semibold text-gray-900">Generating personalized outreach...</span>
-                      </div>
-                      <div className="bg-purple-50 rounded-lg p-4 border border-purple-200 mb-4">
-                        <p className="text-sm text-purple-900 font-medium mb-2">AI Processing Steps:</p>
-                        <div className="space-y-2 text-sm text-gray-700">
-                          <div className="flex items-center gap-2">
-                            <CheckCircle className="w-4 h-4 text-green-600" />
-                            <span>✓ Analyzing company website</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <CheckCircle className="w-4 h-4 text-green-600" />
-                            <span>✓ Scoring lead quality: 92/100</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Loader2 className="w-4 h-4 text-purple-600 animate-spin" />
-                            <span>Crafting personalized message...</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    {/* Generated message preview */}
-                    <div className="bg-gray-50 rounded-lg p-6 border border-gray-300">
-                      <p className="text-xs text-gray-500 mb-3 uppercase font-semibold">AI-Generated Message Preview</p>
-                      <div className="space-y-3 text-gray-700">
-                        <p>Hi Sarah,</p>
-                        <p>
-                          I noticed Atlanta Digital Solutions has been growing fast — congrats on the recent client wins! 
-                          I work with marketing agencies like yours to help scale client acquisition without the manual grind.
-                        </p>
-                        <p>
-                          Would you be open to a quick 15-minute chat this week to see if our system could help you land 
-                          10-20 more clients per month?
-                        </p>
-                        <p>Best,<br />Alex</p>
-                      </div>
-                      <div className="mt-4 flex gap-2">
-                        <button className="px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold text-sm hover:bg-purple-700">
-                          Approve & Queue
-                        </button>
-                        <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-semibold text-sm hover:bg-gray-300">
-                          Regenerate
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  {/* Image placeholder indicator */}
-                  <div className="absolute top-4 right-4 bg-purple-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                    image3.png
-                  </div>
-                </div>
+                <img 
+                  src={Image3} 
+                  alt="AI assistant generating personalized outreach messages" 
+                  className="w-full h-auto"
+                />
               </div>
               <div className="mt-6 text-center">
                 <h3 className="text-2xl font-bold text-gray-900 mb-3">AI generates and personalizes outreach automatically</h3>
@@ -575,52 +485,11 @@ const TimingoFlow = () => {
             {/* Image 2 - Outreach Sending */}
             <div className="animate-on-scroll">
               <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl border-2 border-gray-200 overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300">
-                {/* Placeholder for image2.png */}
-                <div className="bg-gradient-to-br from-blue-100 to-cyan-100 p-8 min-h-[400px] flex items-center justify-center relative">
-                  <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-4xl">
-                    {/* Mock email sending panel */}
-                    <div className="mb-4 flex items-center justify-between">
-                      <h4 className="text-lg font-bold text-gray-900">Outreach Queue (3 ready to send)</h4>
-                      <button className="px-6 py-2 flow-gradient text-white rounded-lg font-semibold hover:shadow-lg transition-all">
-                        Send All
-                      </button>
-                    </div>
-                    {/* Email previews */}
-                    <div className="space-y-3">
-                      {[
-                        { name: 'Sarah Johnson', email: 'sarah@atlantadigital.com', status: 'Queued', color: 'yellow' },
-                        { name: 'Mike Peterson', email: 'mike@peachtreemarketing.com', status: 'Sent', color: 'blue' },
-                        { name: 'Lisa Chen', email: 'lisa@southerngrowth.com', status: 'Delivered', color: 'green' }
-                      ].map((contact, idx) => (
-                        <div key={idx} className="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-purple-300 transition-all">
-                          <div className="flex items-start justify-between mb-3">
-                            <div>
-                              <p className="font-semibold text-gray-900">{contact.name}</p>
-                              <p className="text-sm text-gray-600">{contact.email}</p>
-                            </div>
-                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                              contact.color === 'yellow' ? 'bg-yellow-100 text-yellow-800' :
-                              contact.color === 'blue' ? 'bg-blue-100 text-blue-800' :
-                              'bg-green-100 text-green-800'
-                            }`}>
-                              {contact.status}
-                            </span>
-                          </div>
-                          <div className="bg-white rounded p-3 text-sm text-gray-700 border border-gray-200">
-                            <p className="font-medium mb-1">Subject: Quick question about scaling client acquisition</p>
-                            <p className="text-xs text-gray-600 line-clamp-2">
-                              Hi {contact.name.split(' ')[0]}, I noticed your agency has been growing fast — congrats on the recent...
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  {/* Image placeholder indicator */}
-                  <div className="absolute top-4 right-4 bg-purple-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                    image2.png
-                  </div>
-                </div>
+                <img 
+                  src={Image2} 
+                  alt="Personalized outreach queue ready to send" 
+                  className="w-full h-auto"
+                />
               </div>
               <div className="mt-6 text-center">
                 <h3 className="text-2xl font-bold text-gray-900 mb-3">Send personalized outreach at scale</h3>
