@@ -21,7 +21,7 @@ export default async function handler(req, res) {
 
   console.log('Subscribe API called with body:', req.body);
 
-  const resend = new Resend('re_JRn1Ku9c_65t4wYW4stBfhNKrjxGHksxb');
+  const resend = new Resend('re_gbdZsVDi_LR6jmfCi3QBTXqWwbqrJi7kg');
 
   const { email } = req.body || {};
   
