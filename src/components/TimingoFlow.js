@@ -51,10 +51,11 @@ const TimingoFlow = () => {
     };
 
     try {
-      await axios.post('/api/demo', payload, {
+      const response = await axios.post('/api/demo', payload, {
         headers: { 'Content-Type': 'application/json' }
       });
 
+      console.log('Demo API response:', response.data);
       setSubmitStatus('success');
       demoForm.current.reset();
 
@@ -63,6 +64,7 @@ const TimingoFlow = () => {
       }, 5000);
     } catch (error) {
       console.error('Demo submission error:', error);
+      console.error('Error response:', error.response?.data);
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);

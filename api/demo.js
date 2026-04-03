@@ -15,13 +15,18 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  console.log('Demo API called with body:', req.body);
+
   const resend = new Resend('re_JRn1Ku9c_65t4wYW4stBfhNKrjxGHksxb');
 
   const { name, email, phone, industry } = req.body || {};
 
   if (!name || !email) {
+    console.log('Missing required fields');
     return res.status(400).json({ error: 'Missing required fields: name, email' });
   }
+
+  console.log('Attempting to send emails for:', { name, email, phone, industry });
 
   try {
     // Send to admin
@@ -39,7 +44,16 @@ export default async function handler(req, res) {
       `,
     });
 
-    console.log('Admin email sent:', adminEmail);
+    console.log('Admin email response:', JSON.stringify(adminEmail, null, 2));
+
+    if (adminEmail.error) {
+      console.error('Resend API error:', adminEmail.error);
+      return res.status(500).json({ 
+        error: 'Email service error', 
+        details: adminEmail.error,
+        debug: { name, email, phone, industry }
+      });
+    }
 
     // Send confirmation to user
     try {
@@ -58,9 +72,23 @@ export default async function handler(req, res) {
       console.error('Demo auto-reply error:', replyErr);
     }
 
-    return res.status(200).json({ ok: true, emailId: adminEmail.id });
+    console.log('Returning success response with emailId:', adminEmail.id);
+    return res.status(200).json({ 
+      ok: true, 
+      emailId: adminEmail.id,
+      message: 'Demo request submitted successfully',
+      debug: {
+        adminEmailSent: !!adminEmail.id,
+        timestamp: new Date().toISOString()
+      }
+    });
   } catch (err) {
     console.error('Demo email error:', err);
-    return res.status(500).json({ error: 'Failed to send demo request', details: err.message || String(err) });
+    console.error('Error details:', JSON.stringify(err, null, 2));
+    return res.status(500).json({ 
+      error: 'Failed to send demo request', 
+      details: err.message || String(err),
+      stack: err.stack
+    });
   }
 }

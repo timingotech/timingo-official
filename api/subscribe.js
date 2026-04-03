@@ -19,13 +19,18 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  console.log('Subscribe API called with body:', req.body);
+
   const resend = new Resend('re_JRn1Ku9c_65t4wYW4stBfhNKrjxGHksxb');
 
   const { email } = req.body || {};
   
   if (!email) {
+    console.log('Email is required');
     return res.status(400).json({ error: 'Email is required' });
   }
+
+  console.log('Attempting to send welcome email to:', email);
 
   try {
     // Send welcome email

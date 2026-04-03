@@ -15,13 +15,18 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  console.log('Contact API called with body:', req.body);
+
   const resend = new Resend('re_JRn1Ku9c_65t4wYW4stBfhNKrjxGHksxb');
 
   const { name, email, phone, company, service_interest, message } = req.body || {};
 
   if (!name || !email || !message) {
+    console.log('Missing required fields');
     return res.status(400).json({ error: 'Missing required fields: name, email, message' });
   }
+
+  console.log('Attempting to send contact emails for:', { name, email });
 
   try {
     // Send to admin
@@ -39,7 +44,15 @@ export default async function handler(req, res) {
       `,
     });
 
-    console.log('Admin email sent:', adminEmail);
+    console.log('Admin email response:', JSON.stringify(adminEmail, null, 2));
+
+    if (adminEmail.error) {
+      console.error('Resend API error:', adminEmail.error);
+      return res.status(500).json({ 
+        error: 'Email service error', 
+        details: adminEmail.error
+      });
+    }
 
     // Send auto-reply to user
     try {
