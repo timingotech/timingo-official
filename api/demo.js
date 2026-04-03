@@ -25,8 +25,8 @@ export default async function handler(req, res) {
 
   try {
     // Send to admin
-    await resend.emails.send({
-      from: 'TimingoTech <team@timingotech.com>',
+    const adminEmail = await resend.emails.send({
+      from: 'TimingoFlow <onboarding@resend.dev>',
       to: 'team@timingotech.com',
       subject: `🚀 New TimingoFlow Demo Request from ${name}`,
       html: `<h3>New TimingoFlow Demo Booking</h3>
@@ -39,10 +39,12 @@ export default async function handler(req, res) {
       `,
     });
 
+    console.log('Admin email sent:', adminEmail);
+
     // Send confirmation to user
     try {
-      await resend.emails.send({
-        from: 'TimingoTech <team@timingotech.com>',
+      const userEmail = await resend.emails.send({
+        from: 'TimingoFlow <onboarding@resend.dev>',
         to: email,
         subject: 'Your TimingoFlow Demo Request',
         html: `<p>Hi ${name},</p>
@@ -51,13 +53,14 @@ export default async function handler(req, res) {
           <p>Best regards,<br/>TimingoTech Team</p>
         `,
       });
+      console.log('User confirmation sent:', userEmail);
     } catch (replyErr) {
       console.error('Demo auto-reply error:', replyErr);
     }
 
-    return res.status(200).json({ ok: true });
+    return res.status(200).json({ ok: true, emailId: adminEmail.id });
   } catch (err) {
     console.error('Demo email error:', err);
-    return res.status(500).json({ error: 'Failed to send demo request', details: err.message });
+    return res.status(500).json({ error: 'Failed to send demo request', details: err.message || String(err) });
   }
 }

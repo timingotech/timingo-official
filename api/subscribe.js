@@ -29,8 +29,8 @@ export default async function handler(req, res) {
 
   try {
     // Send welcome email
-    await resend.emails.send({
-      from: 'TimingoTech <team@timingotech.com>',
+    const welcomeEmail = await resend.emails.send({
+      from: 'TimingoTech Newsletter <onboarding@resend.dev>',
       to: email,
       subject: 'Thanks for subscribing to TimingoTech',
       html: `<p>Thanks for subscribing!</p>
@@ -39,23 +39,26 @@ export default async function handler(req, res) {
       `,
     });
 
+    console.log('Welcome email sent:', welcomeEmail);
+
     // Also notify admin about new subscriber
     try {
-      await resend.emails.send({
-        from: 'TimingoTech <team@timingotech.com>',
+      const adminEmail = await resend.emails.send({
+        from: 'TimingoTech Newsletter <onboarding@resend.dev>',
         to: 'team@timingotech.com',
         subject: '📬 New Newsletter Subscriber',
         html: `<p>New subscriber: <strong>${email}</strong></p>
           <p>Subscribed at: ${new Date().toISOString()}</p>
         `,
       });
+      console.log('Admin notification sent:', adminEmail);
     } catch (notifyErr) {
       console.error('Admin notification error:', notifyErr);
     }
 
-    return res.status(200).json({ ok: true, message: 'Successfully subscribed' });
+    return res.status(200).json({ ok: true, message: 'Successfully subscribed', emailId: welcomeEmail.id });
   } catch (err) {
     console.error('Subscribe email error:', err);
-    return res.status(500).json({ error: 'Failed to subscribe', details: err.message });
+    return res.status(500).json({ error: 'Failed to subscribe', details: err.message || String(err) });
   }
 }

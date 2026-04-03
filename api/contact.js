@@ -25,8 +25,8 @@ export default async function handler(req, res) {
 
   try {
     // Send to admin
-    await resend.emails.send({
-      from: 'TimingoTech <team@timingotech.com>',
+    const adminEmail = await resend.emails.send({
+      from: 'TimingoTech Contact <onboarding@resend.dev>',
       to: 'team@timingotech.com',
       subject: `New contact from ${name} (${email})`,
       html: `<h3>New contact submission</h3>
@@ -39,10 +39,12 @@ export default async function handler(req, res) {
       `,
     });
 
+    console.log('Admin email sent:', adminEmail);
+
     // Send auto-reply to user
     try {
-      await resend.emails.send({
-        from: 'TimingoTech <team@timingotech.com>',
+      const userEmail = await resend.emails.send({
+        from: 'TimingoTech <onboarding@resend.dev>',
         to: email,
         subject: 'Thanks for contacting TimingoTech',
         html: `<p>Hi ${name},</p>
@@ -50,13 +52,14 @@ export default async function handler(req, res) {
           <p>Best regards,<br/>TimingoTech Team</p>
         `,
       });
+      console.log('User auto-reply sent:', userEmail);
     } catch (replyErr) {
       console.error('Auto-reply error:', replyErr);
     }
 
-    return res.status(200).json({ ok: true });
+    return res.status(200).json({ ok: true, emailId: adminEmail.id });
   } catch (err) {
     console.error('Contact email error:', err);
-    return res.status(500).json({ error: 'Failed to send email', details: err.message });
+    return res.status(500).json({ error: 'Failed to send email', details: err.message || String(err) });
   }
 }
