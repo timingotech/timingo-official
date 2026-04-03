@@ -111,7 +111,7 @@ const TimingoFlow = () => {
   ];
 
   const results = [
-    { stat: '10-30 Clients/Month', desc: 'Consistent new business every month' },
+    { stat: '10-30 Client Opportunities/Month', desc: 'Consistent new business every month' },
     { stat: 'Qualified Leads', desc: 'Businesses already looking for your service' },
     { stat: 'Personalized Outreach', desc: 'Messages that get responses, not ignored' },
     { stat: 'Automated Pipeline', desc: 'System runs while you focus on closing' }
@@ -261,7 +261,7 @@ const TimingoFlow = () => {
   return (
     <div className="min-h-screen bg-white">
       <Helmet>
-        <title>TimingoFlow - Get 10-30 Qualified Clients Every Month | Client Acquisition for Agencies</title>
+        <title>TimingoFlow - Get 10-30 Qualified Client Opportunities Every Month | Client Acquisition for Agencies</title>
         <meta name="description" content="Get consistent clients for your agency. We find businesses already needing your service, reach out with personalized messages, and book meetings automatically. Built for marketing, web design, and consulting agencies." />
         <meta name="keywords" content="client acquisition, agency clients, marketing agency leads, web design clients, consulting clients, automated client generation, agency growth, get clients" />
         <link rel="canonical" href="https://www.timingotech.com/timingoflow" />
@@ -298,10 +298,13 @@ const TimingoFlow = () => {
               By Timingotech
             </div>
             <h1 className="text-5xl md:text-7xl font-bold text-white leading-tight">
-              Get 10–30 Qualified Clients<br />Every Month Without Cold Outreach
+              Get 10–30 Qualified Client Opportunities<br />Every Month Without Cold Outreach
             </h1>
             <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto leading-relaxed">
               We find, contact, and convert businesses already needing your service — so you don't have to chase leads.
+            </p>
+            <p className="text-lg text-white/80 max-w-2xl mx-auto pt-2">
+              Built for agencies looking to grow consistently without increasing workload.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8">
               <button 
@@ -319,7 +322,10 @@ const TimingoFlow = () => {
               </button>
             </div>
             <p className="text-white/80 text-sm mt-4">
-              No pressure. See exactly how it works for your agency.
+              No contracts. Cancel anytime. See exactly how it works for your agency.
+            </p>
+            <p className="text-white/70 text-xs mt-2">
+              ⚡ Currently onboarding a limited number of agencies
             </p>
           </div>
         </div>
@@ -334,7 +340,7 @@ const TimingoFlow = () => {
             </h2>
             <p className="text-lg text-gray-700 leading-relaxed max-w-2xl mx-auto">
               We'll show you exactly how this would bring in clients for your agency before you commit to anything.
-              If it makes sense, we continue. If not, no worries.
+              If it doesn't make sense for your agency, you don't continue — simple.
             </p>
           </div>
         </div>
@@ -474,9 +480,9 @@ const TimingoFlow = () => {
                 />
               </div>
               <div className="mt-6 text-center">
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">AI generates and personalizes outreach automatically</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">The system writes messages tailored to each business automatically</h3>
                 <p className="text-gray-700 max-w-3xl mx-auto leading-relaxed">
-                  The AI analyzes each lead and creates tailored messages based on their business, website, and potential needs — 
+                  The system analyzes each lead and creates tailored messages based on their business, website, and potential needs — 
                   no manual writing required.
                 </p>
               </div>
@@ -564,19 +570,19 @@ const TimingoFlow = () => {
               <h3 className="text-xl font-bold text-gray-900 mb-4">Sample Leads</h3>
               <div className="space-y-3">
                 <div className="p-3 bg-gray-50 rounded">
-                  <p className="font-semibold text-gray-900">Acme Marketing Co.</p>
-                  <p className="text-sm text-gray-600">Looking for web design services</p>
-                  <p className="text-xs text-purple-600 mt-1">Score: 92/100</p>
+                  <p className="font-semibold text-gray-900">BrightClean SF</p>
+                  <p className="text-sm text-gray-600">contact@brightcleansf.com</p>
+                  <p className="text-xs text-purple-600 mt-1">Score: 92/100 • Looking for web design</p>
                 </div>
                 <div className="p-3 bg-gray-50 rounded">
-                  <p className="font-semibold text-gray-900">Growth Digital Ltd.</p>
-                  <p className="text-sm text-gray-600">Needs SEO consultant</p>
-                  <p className="text-xs text-purple-600 mt-1">Score: 88/100</p>
+                  <p className="font-semibold text-gray-900">Golden Bay Cleaning</p>
+                  <p className="text-sm text-gray-600">info@goldenbayclean.com</p>
+                  <p className="text-xs text-purple-600 mt-1">Score: 88/100 • Needs SEO help</p>
                 </div>
                 <div className="p-3 bg-gray-50 rounded">
-                  <p className="font-semibold text-gray-900">Tech Solutions Inc.</p>
-                  <p className="text-sm text-gray-600">Hiring marketing agency</p>
-                  <p className="text-xs text-purple-600 mt-1">Score: 95/100</p>
+                  <p className="font-semibold text-gray-900">Sparkle Home Services</p>
+                  <p className="text-sm text-gray-600">hello@sparklehomeservices.com</p>
+                  <p className="text-xs text-purple-600 mt-1">Score: 95/100 • Hiring marketing agency</p>
                 </div>
               </div>
             </div>
@@ -587,10 +593,13 @@ const TimingoFlow = () => {
               <div className="p-4 bg-gray-50 rounded text-sm text-gray-700 leading-relaxed">
                 <p className="mb-2">Hi Sarah,</p>
                 <p className="mb-2">
-                  Noticed you're looking for SEO help for Growth Digital. We specialize in helping B2B companies like yours rank for competitive keywords.
+                  Came across BrightClean SF — looks like you might be looking into SEO support.
                 </p>
                 <p className="mb-2">
-                  Would love to show you a quick case study from a similar client we helped — are you free for 15 min this week?
+                  I work with a few companies in a similar position and thought it might be worth a quick chat.
+                </p>
+                <p className="mb-2">
+                  Would you be open to a quick call sometime this week?
                 </p>
                 <p>Best,<br />Alex</p>
               </div>
@@ -850,7 +859,7 @@ const TimingoFlow = () => {
                     </>
                   ) : (
                     <>
-                      See How It Works For You
+                      See This Working For Your Agency
                       <ChevronRight className="w-5 h-5" />
                     </>
                   )}
