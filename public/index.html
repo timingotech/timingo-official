@@ -123,6 +123,28 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+    
+    <!-- LinkTracker Analytics -->
+    <script src="https://timingotech.com/tracking.js"></script>
+    <script>
+      LinkTracker.init({
+        apiUrl: "https://leadgen-1087946781393.europe-west1.run.app",
+        userEmail: "team@timingotech.com",
+        leadId: null,
+        campaignSource: "website",
+        campaignMedium: "organic",
+        campaignName: "main_site",
+        trackExternal: true,
+        trackInternal: true,
+        trackPageViews: true,
+        trackScroll: true,
+        trackForms: true,
+        trackSessionDuration: true,
+        debug: false
+      });
+    </script>
+    <!-- End LinkTracker Analytics -->
+    
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
