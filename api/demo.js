@@ -31,7 +31,7 @@ export default async function handler(req, res) {
   try {
     // Send to admin
     const adminEmail = await resend.emails.send({
-      from: 'TimingoFlow <onboarding@resend.dev>',
+      from: 'TimingoFlow <team@timingotech.com>',
       to: 'team@timingotech.com',
       subject: `🚀 New TimingoFlow Demo Request from ${name}`,
       html: `<h3>New TimingoFlow Demo Booking</h3>
@@ -58,7 +58,7 @@ export default async function handler(req, res) {
     // Send confirmation to user
     try {
       const userEmail = await resend.emails.send({
-        from: 'TimingoFlow <onboarding@resend.dev>',
+        from: 'TimingoFlow <team@timingotech.com>',
         to: email,
         subject: 'Your TimingoFlow Demo Request',
         html: `<p>Hi ${name},</p>

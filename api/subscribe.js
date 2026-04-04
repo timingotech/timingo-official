@@ -35,7 +35,7 @@ export default async function handler(req, res) {
   try {
     // Send welcome email
     const welcomeEmail = await resend.emails.send({
-      from: 'TimingoTech Newsletter <onboarding@resend.dev>',
+      from: 'TimingoTech Newsletter <team@timingotech.com>',
       to: email,
       subject: 'Thanks for subscribing to TimingoTech',
       html: `<p>Thanks for subscribing!</p>
@@ -49,7 +49,7 @@ export default async function handler(req, res) {
     // Also notify admin about new subscriber
     try {
       const adminEmail = await resend.emails.send({
-        from: 'TimingoTech Newsletter <onboarding@resend.dev>',
+        from: 'TimingoTech Newsletter <team@timingotech.com>',
         to: 'team@timingotech.com',
         subject: '📬 New Newsletter Subscriber',
         html: `<p>New subscriber: <strong>${email}</strong></p>

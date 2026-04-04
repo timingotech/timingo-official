@@ -31,7 +31,7 @@ export default async function handler(req, res) {
   try {
     // Send to admin
     const adminEmail = await resend.emails.send({
-      from: 'TimingoTech Contact <onboarding@resend.dev>',
+      from: 'TimingoTech Contact <team@timingotech.com>',
       to: 'team@timingotech.com',
       subject: `New contact from ${name} (${email})`,
       html: `<h3>New contact submission</h3>
@@ -57,7 +57,7 @@ export default async function handler(req, res) {
     // Send auto-reply to user
     try {
       const userEmail = await resend.emails.send({
-        from: 'TimingoTech <onboarding@resend.dev>',
+        from: 'TimingoTech <team@timingotech.com>',
         to: email,
         subject: 'Thanks for contacting TimingoTech',
         html: `<p>Hi ${name},</p>
