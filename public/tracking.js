@@ -62,6 +62,8 @@
 
       this.log('Initialized with config:', this.config);
 
+      this.hydrateIdentityFromUrl();
+
       if (!this.config.sessionId) {
         this.config.sessionId = this.generateSessionId();
       }
@@ -150,6 +152,8 @@
       var href = link.getAttribute('href');
       if (!href) return;
 
+      href = this.normalizeTrackableUrl(href);
+
       var shouldTrack = this.shouldTrackLink(href);
       if (!shouldTrack) return;
 
@@ -172,6 +176,44 @@
       return 'sess_' + Math.random().toString(36).slice(2) + '_' + Date.now().toString(36);
     },
 
+    hydrateIdentityFromUrl: function() {
+      try {
+        var params = new URLSearchParams(window.location.search || '');
+        var emailFromUrl = params.get('lt_email');
+        var leadIdFromUrl = params.get('lt_lead_id');
+
+        if (emailFromUrl) {
+          this.config.userEmail = emailFromUrl;
+          sessionStorage.setItem('lt_user_email', emailFromUrl);
+        } else if (!this.config.userEmail) {
+          this.config.userEmail = sessionStorage.getItem('lt_user_email') || this.config.userEmail;
+        }
+
+        if (leadIdFromUrl) {
+          this.config.leadId = Number(leadIdFromUrl) || this.config.leadId;
+          sessionStorage.setItem('lt_lead_id', String(leadIdFromUrl));
+        } else if (!this.config.leadId) {
+          var storedLeadId = sessionStorage.getItem('lt_lead_id');
+          if (storedLeadId) this.config.leadId = Number(storedLeadId) || this.config.leadId;
+        }
+      } catch (e) {
+        this.log('Failed to hydrate identity from URL:', e);
+      }
+    },
+
+    normalizeTrackableUrl: function(href) {
+      if (!href) return href;
+      var trimmed = String(href).trim();
+      if (!trimmed || /^(#|mailto:|tel:|data:|javascript:)/i.test(trimmed)) return trimmed;
+      if (/^[a-z][a-z0-9+.-]*:\/\//i.test(trimmed)) return trimmed;
+
+      var domainCandidate = trimmed.split('/')[0];
+      if (domainCandidate.indexOf('.') !== -1 && domainCandidate.indexOf(' ') === -1) {
+        return 'https://' + trimmed;
+      }
+      return trimmed;
+    },
+
     trackSessionEnd: function(source) {
       if (!this.sessionStartMs) return;
       var durationSec = Math.max(1, Math.round((Date.now() - this.sessionStartMs) / 1000));
@@ -191,6 +233,8 @@
      */
     shouldTrackLink: function(href) {
       if (!href) return false;
+
+      href = this.normalizeTrackableUrl(href);
 
       // Skip anchor links
       if (href.startsWith('#')) return false;
@@ -233,6 +277,8 @@
      * Check if link is external
      */
     isExternalLink: function(href) {
+      href = this.normalizeTrackableUrl(href);
+
       if (href.startsWith('mailto:') || href.startsWith('tel:')) {
         return false;
       }
@@ -266,6 +312,7 @@
      * Track the click by sending data to backend
      */
     trackClick: function(targetUrl) {
+      targetUrl = this.normalizeTrackableUrl(targetUrl);
       var data = {
         target_url: targetUrl,
         event_name: 'link_click'
