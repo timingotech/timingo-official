@@ -63,6 +63,7 @@
       this.log('Initialized with config:', this.config);
 
       this.hydrateIdentityFromUrl();
+      this.cleanTrackingParamsFromUrl();
 
       if (!this.config.sessionId) {
         this.config.sessionId = this.generateSessionId();
@@ -198,6 +199,40 @@
         }
       } catch (e) {
         this.log('Failed to hydrate identity from URL:', e);
+      }
+    },
+
+    /**
+     * Clean tracking parameters from the URL to avoid exposing user data
+     */
+    cleanTrackingParamsFromUrl: function() {
+      try {
+        if (!window.history || !window.history.replaceState) return;
+        
+        var url = new URL(window.location.href);
+        var params = url.searchParams;
+        
+        // Check if any tracking params exist
+        var hasTrackingParams = params.has('lt_email') || params.has('lt_lead_id') || 
+                                params.has('lt_message_id') || params.has('lt_source');
+        
+        if (!hasTrackingParams) return;
+        
+        // Remove all tracking parameters
+        params.delete('lt_email');
+        params.delete('lt_lead_id');
+        params.delete('lt_message_id');
+        params.delete('lt_source');
+        
+        // Build clean URL
+        var cleanUrl = url.pathname + (url.search ? url.search : '') + url.hash;
+        
+        // Replace the URL without reloading the page
+        window.history.replaceState({}, document.title, cleanUrl);
+        
+        this.log('Cleaned tracking parameters from URL');
+      } catch (e) {
+        this.log('Failed to clean tracking parameters:', e);
       }
     },
 
