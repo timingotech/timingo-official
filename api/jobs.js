@@ -29,7 +29,11 @@ function matchesAnyTerm(haystack, terms) {
 async function fetchRemoteOK() {
   const { data } = await axios.get('https://remoteok.com/api', {
     headers: { 'User-Agent': 'TimingoTech-JobFinder/1.0 (+https://timingotech.com)' },
-    timeout: 10000,
+    // Kept short: sources run in parallel via Promise.allSettled, and the slowest one
+    // sets the function's total runtime — a single stalled request (e.g. RemoteOK's
+    // bot-protection stalling cloud/datacenter IPs) can otherwise push the whole
+    // invocation past Vercel's ~10s execution limit and crash it outright.
+    timeout: 6000,
   });
   const jobs = Array.isArray(data) ? data.slice(1) : [];
   return jobs.map((job) => ({
@@ -48,7 +52,7 @@ async function fetchRemoteOK() {
 }
 
 async function fetchArbeitnow() {
-  const { data } = await axios.get('https://www.arbeitnow.com/api/job-board-api', { timeout: 10000 });
+  const { data } = await axios.get('https://www.arbeitnow.com/api/job-board-api', { timeout: 6000 });
   const jobs = Array.isArray(data?.data) ? data.data : [];
   return jobs.map((job) => ({
     id: `arbeitnow-${job.slug}`,
@@ -73,7 +77,7 @@ async function fetchAdzuna({ what, location }) {
 
   const country = process.env.ADZUNA_COUNTRY || 'us';
   const { data } = await axios.get(`https://api.adzuna.com/v1/api/jobs/${country}/search/1`, {
-    timeout: 10000,
+    timeout: 6000,
     params: {
       app_id: appId,
       app_key: appKey,
