@@ -279,9 +279,9 @@ function JobFinder() {
         <div className="mt-4 flex items-start gap-2 text-xs text-gray-500">
           <SlidersHorizontal className="mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
           <p>
-            Results are pulled live from RemoteOK and Arbeitnow (plus Adzuna, when configured) — these are real job-board
-            feeds, not a crawl of the entire web. Hybrid/on-site detection is best-effort, since most free feeds focus on
-            remote roles.
+            Results are pulled live from RemoteOK, Arbeitnow, Remotive, Jobicy, The Muse, Himalayas, and Adzuna — real
+            job-board feeds, not a crawl of the entire web. Hybrid/on-site detection is best-effort, since most free
+            feeds focus on remote roles.
           </p>
         </div>
 

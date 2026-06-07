@@ -12,7 +12,7 @@ async function fetchJson(url, options = {}) {
   return response.json();
 }
 
-const SOURCE_NAMES = ['RemoteOK', 'Arbeitnow', 'Adzuna'];
+const SOURCE_NAMES = ['RemoteOK', 'Arbeitnow', 'Adzuna', 'Remotive', 'Jobicy', 'The Muse', 'Himalayas'];
 
 const POSTED_WITHIN_HOURS = {
   '24h': 24,
@@ -109,6 +109,83 @@ async function fetchAdzuna({ what, location }) {
   }));
 }
 
+async function fetchRemotive() {
+  const data = await fetchJson('https://remotive.com/api/remote-jobs?limit=100');
+  const jobs = Array.isArray(data?.jobs) ? data.jobs : [];
+  return jobs.map((job) => ({
+    id: `remotive-${job.id}`,
+    title: job.title || 'Untitled role',
+    company: job.company_name || 'Unknown company',
+    location: job.candidate_required_location || 'Remote',
+    remote: true,
+    jobType: job.job_type ? job.job_type.replace(/_/g, ' ') : null,
+    tags: Array.isArray(job.tags) ? job.tags : [],
+    description: job.description || '',
+    postedAt: job.publication_date ? new Date(job.publication_date) : null,
+    url: job.url,
+    source: 'Remotive',
+  }));
+}
+
+async function fetchJobicy() {
+  const data = await fetchJson('https://jobicy.com/api/v2/remote-jobs?count=100');
+  const jobs = Array.isArray(data?.jobs) ? data.jobs : [];
+  return jobs.map((job) => ({
+    id: `jobicy-${job.id}`,
+    title: job.jobTitle || 'Untitled role',
+    company: job.companyName || 'Unknown company',
+    location: job.jobGeo || 'Remote',
+    remote: true,
+    jobType: Array.isArray(job.jobType) && job.jobType.length ? job.jobType.join(', ') : null,
+    tags: Array.isArray(job.jobIndustry) ? job.jobIndustry : [],
+    description: job.jobExcerpt || '',
+    postedAt: job.pubDate ? new Date(job.pubDate) : null,
+    url: job.url,
+    source: 'Jobicy',
+  }));
+}
+
+async function fetchTheMuse() {
+  const data = await fetchJson('https://www.themuse.com/api/public/jobs?page=1');
+  const jobs = Array.isArray(data?.results) ? data.results : [];
+  return jobs.map((job) => {
+    const locations = Array.isArray(job.locations) ? job.locations.map((l) => l.name).filter(Boolean) : [];
+    return {
+      id: `muse-${job.id}`,
+      title: job.name || 'Untitled role',
+      company: job.company?.name || 'Unknown company',
+      location: locations.join(', '),
+      remote: locations.some((l) => /remote/i.test(l)),
+      jobType: Array.isArray(job.levels) && job.levels.length ? job.levels.map((l) => l.name).join(', ') : null,
+      tags: Array.isArray(job.tags) ? job.tags : [],
+      description: job.contents || '',
+      postedAt: job.publication_date ? new Date(job.publication_date) : null,
+      url: job.refs?.landing_page,
+      source: 'The Muse',
+    };
+  });
+}
+
+async function fetchHimalayas() {
+  const data = await fetchJson('https://himalayas.app/jobs/api?limit=100');
+  const jobs = Array.isArray(data?.jobs) ? data.jobs : [];
+  return jobs.map((job) => ({
+    id: `himalayas-${job.guid || job.applicationLink}`,
+    title: job.title || 'Untitled role',
+    company: job.companyName || 'Unknown company',
+    location: Array.isArray(job.locationRestrictions) && job.locationRestrictions.length
+      ? job.locationRestrictions.join(', ')
+      : 'Remote',
+    remote: true,
+    jobType: job.employmentType || null,
+    tags: Array.isArray(job.categories) ? job.categories : [],
+    description: job.excerpt || job.description || '',
+    postedAt: job.pubDate ? new Date(job.pubDate * 1000) : null,
+    url: job.applicationLink || job.guid,
+    source: 'Himalayas',
+  }));
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -143,6 +220,10 @@ export default async function handler(req, res) {
       fetchRemoteOK(),
       fetchArbeitnow(),
       fetchAdzuna({ what: [keywords, industryTerms].filter(Boolean).join(' '), location }),
+      fetchRemotive(),
+      fetchJobicy(),
+      fetchTheMuse(),
+      fetchHimalayas(),
     ]);
 
     const sourceStatus = {};
