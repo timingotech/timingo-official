@@ -3,6 +3,8 @@ import { Helmet } from 'react-helmet-async';
 import axios from 'axios';
 import {
   Bell,
+  BellRing,
+  BellOff,
   Building2,
   Users,
   Calendar,
@@ -84,6 +86,45 @@ function timeUntilLabel(dueAt, completed) {
   if (hours < 48) return { text: `In ${hours} hour${hours === 1 ? '' : 's'}`, tone: hours <= 6 ? 'soon' : 'upcoming' };
   const days = Math.round(hours / 24);
   return { text: `In ${days} day${days === 1 ? '' : 's'}`, tone: 'upcoming' };
+}
+
+// Web Push wants the VAPID public key as a Uint8Array, but it's handed out base64url-encoded.
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = window.atob(base64);
+  return Uint8Array.from([...rawData].map((char) => char.charCodeAt(0)));
+}
+
+async function subscribeToPush() {
+  const publicKey = process.env.REACT_APP_VAPID_PUBLIC_KEY;
+  if (!publicKey) throw new Error('Push notifications are not configured for this site.');
+
+  const registration = await navigator.serviceWorker.register('/reminders-sw.js', { scope: '/reminders' });
+  await navigator.serviceWorker.ready;
+
+  const permission = await Notification.requestPermission();
+  if (permission !== 'granted') throw new Error('Notification permission was not granted.');
+
+  let subscription = await registration.pushManager.getSubscription();
+  if (!subscription) {
+    subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(publicKey),
+    });
+  }
+
+  await axios.post('/api/push-subscribe', { subscription });
+  return subscription;
+}
+
+async function unsubscribeFromPush() {
+  const registration = await navigator.serviceWorker.getRegistration('/reminders');
+  if (!registration) return;
+  const subscription = await registration.pushManager.getSubscription();
+  if (!subscription) return;
+  await axios.delete('/api/push-subscribe', { data: { subscription: { endpoint: subscription.endpoint } } });
+  await subscription.unsubscribe();
 }
 
 const TONE_STYLES = {
@@ -390,6 +431,49 @@ function RemindersDashboard() {
   const [editingId, setEditingId] = useState(null);
   const [busy, setBusy] = useState(false);
   const [companyFilter, setCompanyFilter] = useState('');
+  const [pushState, setPushState] = useState('checking'); // checking | unsupported | enabled | disabled | denied | working
+
+  useEffect(() => {
+    let cancelled = false;
+    async function checkPushStatus() {
+      if (!('serviceWorker' in navigator) || !('PushManager' in window) || !process.env.REACT_APP_VAPID_PUBLIC_KEY) {
+        if (!cancelled) setPushState('unsupported');
+        return;
+      }
+      if (Notification.permission === 'denied') {
+        if (!cancelled) setPushState('denied');
+        return;
+      }
+      try {
+        const registration = await navigator.serviceWorker.getRegistration('/reminders');
+        const subscription = registration ? await registration.pushManager.getSubscription() : null;
+        if (!cancelled) setPushState(subscription ? 'enabled' : 'disabled');
+      } catch {
+        if (!cancelled) setPushState('disabled');
+      }
+    }
+    checkPushStatus();
+    return () => { cancelled = true; };
+  }, []);
+
+  const togglePush = async () => {
+    setError('');
+    setPushState('working');
+    try {
+      if (pushState === 'enabled') {
+        await unsubscribeFromPush();
+        setPushState('disabled');
+        setNotice('Push notifications turned off for this device.');
+      } else {
+        await subscribeToPush();
+        setPushState('enabled');
+        setNotice('Push notifications enabled for this device.');
+      }
+    } catch (err) {
+      setPushState(Notification.permission === 'denied' ? 'denied' : 'disabled');
+      setError(err?.message || 'Could not change push notification settings.');
+    }
+  };
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -519,9 +603,29 @@ function RemindersDashboard() {
               <p className="text-sm text-gray-500">Track follow-ups and nudge people by email before they're due.</p>
             </div>
           </div>
-          <button onClick={signOut} className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-gray-500 transition border border-gray-200 rounded-lg hover:bg-gray-50">
-            <LogOut className="w-4 h-4" /> Sign out
-          </button>
+          <div className="flex items-center gap-2">
+            {pushState !== 'unsupported' && (
+              <button
+                onClick={togglePush}
+                disabled={pushState === 'working' || pushState === 'checking' || pushState === 'denied'}
+                title={pushState === 'denied' ? 'Notifications are blocked in your browser settings' : ''}
+                className={`inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition border rounded-lg disabled:opacity-60 disabled:cursor-not-allowed ${
+                  pushState === 'enabled'
+                    ? 'border-[#6675F7]/30 text-[#4452c9] bg-[#6675F7]/10 hover:bg-[#6675F7]/15'
+                    : 'border-gray-200 text-gray-500 hover:bg-gray-50'
+                }`}
+              >
+                {pushState === 'enabled' ? <BellRing className="w-4 h-4" /> : <BellOff className="w-4 h-4" />}
+                {pushState === 'enabled' && 'Notifications on'}
+                {pushState === 'disabled' && 'Enable notifications'}
+                {pushState === 'denied' && 'Notifications blocked'}
+                {(pushState === 'checking' || pushState === 'working') && 'Notifications…'}
+              </button>
+            )}
+            <button onClick={signOut} className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-gray-500 transition border border-gray-200 rounded-lg hover:bg-gray-50">
+              <LogOut className="w-4 h-4" /> Sign out
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-3 gap-3 mb-6">

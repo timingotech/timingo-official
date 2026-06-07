@@ -1,7 +1,51 @@
 import { createClient } from '@supabase/supabase-js';
+import { Resend } from 'resend';
 
 function getClient() {
   return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+}
+
+// Sent immediately when a reminder is created — separate from (and in addition to)
+// the scheduled "X before due" nudges that api/reminders-check.js sends later.
+async function sendCreatedEmail(reminder) {
+  if (!process.env.RESEND_API_KEY) return;
+
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  // Note: `dateStyle`/`timeStyle` can't be combined with `timeZoneName` (Intl throws), so spell out the parts.
+  const dueLabel = new Date(reminder.due_at).toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZoneName: 'short',
+  });
+
+  const emails = reminder.person_emails || [];
+  const names = reminder.person_names || [];
+
+  await Promise.all(
+    emails.map(async (email, i) => {
+      const name = names[i] || email;
+      try {
+        await resend.emails.send({
+          from: `${process.env.FROM_NAME || 'TimingoTech Reminders'} <${process.env.FROM_EMAIL}>`,
+          to: email,
+          subject: `Reminder set: ${reminder.title}`,
+          html: `<p>Hi ${name},</p>
+            <p>A reminder has just been set for <strong>${reminder.company}</strong>:</p>
+            <h3 style="margin: 8px 0;">${reminder.title}</h3>
+            ${reminder.notes ? `<p>${reminder.notes}</p>` : ''}
+            <p><strong>Due:</strong> ${dueLabel}</p>
+            <p>You'll get follow-up nudges by email as the due time gets closer.</p>
+            <p style="color:#888; font-size: 12px;">Sent by Timingo Tech Reminders</p>
+          `,
+        });
+      } catch (err) {
+        console.error(`Failed to send "reminder created" email to ${email} for ${reminder.id}:`, err);
+      }
+    })
+  );
 }
 
 const UPDATABLE_FIELDS = [
@@ -70,6 +114,11 @@ export default async function handler(req, res) {
         .single();
 
       if (error) throw error;
+
+      // Fire-and-forget: let the person know right away that a reminder was set for them.
+      // Don't let an email hiccup block the API response — the reminder is already saved.
+      sendCreatedEmail(data).catch((err) => console.error('sendCreatedEmail failed:', err));
+
       return res.status(201).json({ reminder: data });
     }
 

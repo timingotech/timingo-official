@@ -22,3 +22,13 @@ create table reminders (
 
 create index reminders_due_at_idx on reminders (due_at);
 create index reminders_company_idx on reminders (company);
+
+-- Browser push subscriptions for the "notify me on this device" toggle.
+-- Safe to run on its own — it does not touch the reminders table above.
+create table if not exists push_subscriptions (
+  id uuid primary key default gen_random_uuid(),
+  endpoint text not null unique,
+  p256dh text not null,
+  auth text not null,
+  created_at timestamptz not null default now()
+);

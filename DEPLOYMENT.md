@@ -107,7 +107,7 @@ behind it.
 
 ### 1. Create the database (Supabase, free tier)
 1. Sign up at [supabase.com](https://supabase.com) and create a new project.
-2. Open **SQL Editor → New query**, paste the contents of [`supabase/schema.sql`](../supabase/schema.sql), and run it. This creates the `reminders` table.
+2. Open **SQL Editor → New query**, paste the contents of [`supabase/schema.sql`](../supabase/schema.sql), and run it. This creates the `reminders` and `push_subscriptions` tables.
 3. Go to **Project Settings → API** and copy:
    - **Project URL** → `SUPABASE_URL`
    - **`service_role` secret key** → `SUPABASE_SERVICE_KEY` (keep this secret — it bypasses row-level security, which is fine here since only your serverless functions use it)
@@ -139,6 +139,30 @@ cron service so it gets checked every few minutes regardless of your Vercel plan
 
 That's it — reminders created on `/reminders` will now email the attached
 person automatically as their due time approaches.
+
+### 4. (Optional) Browser push notifications
+
+In addition to email, `/reminders` can send a native-style push notification
+straight to your phone or laptop — useful if you've added the page to your iOS
+home screen (Settings → Share → Add to Home Screen). It's powered by the
+standard, **free** Web Push API (no third-party push service or paid plan
+needed — it routes through Apple/Google/Mozilla's own free push infrastructure).
+
+1. Generate a VAPID keypair (one-time):
+   ```bash
+   node -e "const wp=require('web-push'); const k=wp.generateVAPIDKeys(); console.log('PUBLIC:',k.publicKey); console.log('PRIVATE:',k.privateKey);"
+   ```
+2. Add these to Vercel's Environment Variables:
+   - `VAPID_PUBLIC_KEY`
+   - `VAPID_PRIVATE_KEY`
+   - `VAPID_SUBJECT` — e.g. `mailto:team@timingotech.com`
+   - `REACT_APP_VAPID_PUBLIC_KEY` — **same value as `VAPID_PUBLIC_KEY`**. The `REACT_APP_` prefix is required so Create React App bakes the public key into the browser bundle at build time.
+3. Redeploy. Then open `/reminders` on your device, sign in, and tap **"Enable notifications"** in the header — your browser will ask for permission, and the device will start receiving push alerts at the same offsets as the emails (1 day / 1 hour / 10 min before, etc).
+
+Notes:
+- iOS only supports this for sites **added to the home screen** (iOS 16.4+) — a normal Safari tab can't receive push notifications.
+- If you ever want to turn it off, tap the same button again ("Notifications on" → off) — this removes the subscription from the database too.
+- Expired/unsubscribed devices are pruned automatically the next time a send fails.
 
 ---
 

@@ -1,5 +1,14 @@
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
+import webpush from 'web-push';
+
+if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+  webpush.setVapidDetails(
+    process.env.VAPID_SUBJECT || 'mailto:team@timingotech.com',
+    process.env.VAPID_PUBLIC_KEY,
+    process.env.VAPID_PRIVATE_KEY
+  );
+}
 
 // Hit on a schedule by an external cron pinger (see DEPLOYMENT.md).
 // Looks for reminders whose notification offsets have come due and emails the attached person.
@@ -15,6 +24,16 @@ export default async function handler(req, res) {
 
   const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
   const resend = new Resend(process.env.RESEND_API_KEY);
+
+  let pushSubscriptions = [];
+  if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+    const { data: subs, error: subsError } = await supabase.from('push_subscriptions').select('*');
+    if (subsError) {
+      console.error('Failed to load push subscriptions:', subsError);
+    } else {
+      pushSubscriptions = subs || [];
+    }
+  }
 
   const now = new Date();
   // Only pull reminders whose due date is within the next two days — keeps the scan cheap.
@@ -44,7 +63,10 @@ export default async function handler(req, res) {
       const triggerAt = new Date(dueAt.getTime() - offsetMinutes * 60 * 1000);
       if (now >= triggerAt && now <= dueAt) {
         // eslint-disable-next-line no-await-in-loop
-        await sendReminderEmail(resend, reminder, offsetMinutes);
+        await Promise.all([
+          sendReminderEmail(resend, reminder, offsetMinutes),
+          sendPushNotifications(supabase, pushSubscriptions, reminder, offsetMinutes),
+        ]);
         newlySent.push(offsetMinutes);
         notificationsSent += 1;
       }
@@ -53,7 +75,10 @@ export default async function handler(req, res) {
     // Past the due time and never notified at "0" — send one final "this is due now" email.
     if (now > dueAt && !sentOffsets.includes(0) && !newlySent.includes(0)) {
       // eslint-disable-next-line no-await-in-loop
-      await sendReminderEmail(resend, reminder, 0);
+      await Promise.all([
+        sendReminderEmail(resend, reminder, 0),
+        sendPushNotifications(supabase, pushSubscriptions, reminder, 0),
+      ]);
       newlySent.push(0);
       notificationsSent += 1;
     }
@@ -117,6 +142,36 @@ async function sendReminderEmail(resend, reminder, offsetMinutes) {
         });
       } catch (err) {
         console.error(`Failed to send reminder email to ${email} for ${reminder.id} (offset ${offsetMinutes}):`, err);
+      }
+    })
+  );
+}
+
+async function sendPushNotifications(supabase, subscriptions, reminder, offsetMinutes) {
+  if (!subscriptions.length) return;
+
+  const when = describeOffset(offsetMinutes);
+  const payload = JSON.stringify({
+    title: offsetMinutes === 0 ? `Due now: ${reminder.title}` : `Reminder (${when}): ${reminder.title}`,
+    body: `${reminder.company} — ${reminder.title}`,
+    tag: `reminder-${reminder.id}-${offsetMinutes}`,
+    url: '/reminders',
+  });
+
+  await Promise.all(
+    subscriptions.map(async (sub) => {
+      try {
+        await webpush.sendNotification(
+          { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
+          payload
+        );
+      } catch (err) {
+        // 404/410 = the browser unsubscribed or the subscription expired — clean it up.
+        if (err.statusCode === 404 || err.statusCode === 410) {
+          await supabase.from('push_subscriptions').delete().eq('endpoint', sub.endpoint);
+        } else {
+          console.error(`Failed to send push notification to ${sub.endpoint}:`, err.body || err.message);
+        }
       }
     })
   );
