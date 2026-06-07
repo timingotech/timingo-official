@@ -723,6 +723,19 @@ function RemindersDashboard() {
 const Reminders = () => {
   const [authed, setAuthed] = useState(() => localStorage.getItem(AUTH_KEY) === 'true');
 
+  // The site-wide manifest.json has start_url "." (the homepage), so iOS "Add to Home
+  // Screen" launches into "/" no matter which page you tapped it from. Swap in a
+  // manifest scoped to /reminders while this page is mounted, then restore on the way out.
+  useEffect(() => {
+    const link = document.querySelector('link[rel="manifest"]');
+    if (!link) return undefined;
+    const original = link.getAttribute('href');
+    link.setAttribute('href', '/reminders-manifest.json');
+    return () => {
+      link.setAttribute('href', original);
+    };
+  }, []);
+
   if (!authed) {
     return <GateForm onSuccess={() => setAuthed(true)} />;
   }
