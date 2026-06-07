@@ -11,6 +11,11 @@ import {
   Loader2,
   AlertCircle,
   SlidersHorizontal,
+  Sparkles,
+  Upload,
+  FileText,
+  CheckCircle2,
+  X,
 } from 'lucide-react';
 
 const INDUSTRIES = [
@@ -76,6 +81,199 @@ function timeAgoLabel(value) {
   if (hours < 24) return `${hours}h ago`;
   const days = Math.floor(hours / 24);
   return `${days}d ago`;
+}
+
+const MAX_RESUME_CHARS = 20000;
+
+// Loaded on demand — pdfjs-dist is sizeable, so we only pull it in when someone
+// actually uploads a PDF rather than bloating the page's main bundle.
+async function extractPdfText(file) {
+  const pdfjs = await import('pdfjs-dist/build/pdf.mjs');
+  // Served as a static file from /public — CRA's webpack config can't bundle workers
+  // out of node_modules, so the file is copied alongside the rest of the public assets.
+  pdfjs.GlobalWorkerOptions.workerSrc = `${process.env.PUBLIC_URL}/pdf.worker.min.mjs`;
+
+  const buffer = await file.arrayBuffer();
+  const pdf = await pdfjs.getDocument({ data: buffer }).promise;
+
+  let text = '';
+  for (let pageNum = 1; pageNum <= pdf.numPages; pageNum += 1) {
+    const page = await pdf.getPage(pageNum);
+    const content = await page.getTextContent();
+    text += content.items.map((item) => item.str).join(' ') + '\n';
+    if (text.length > MAX_RESUME_CHARS) break;
+  }
+  return text.trim();
+}
+
+async function extractResumeText(file) {
+  if (file.type === 'application/pdf' || /\.pdf$/i.test(file.name)) {
+    return extractPdfText(file);
+  }
+  return (await file.text()).trim();
+}
+
+function ResumeUpload({ onApply }) {
+  const [status, setStatus] = useState('idle'); // idle | reading | analyzing | done | error
+  const [error, setError] = useState('');
+  const [fileName, setFileName] = useState('');
+  const [pastedText, setPastedText] = useState('');
+  const [showPaste, setShowPaste] = useState(false);
+  const [detected, setDetected] = useState(null);
+
+  const runAnalysis = useCallback(async (resumeText) => {
+    const trimmed = resumeText.trim();
+    if (!trimmed) {
+      setStatus('error');
+      setError('That resume looks empty — try a different file or paste the text directly.');
+      return;
+    }
+    setStatus('analyzing');
+    setError('');
+    try {
+      const { data } = await axios.post('/api/resume-parse', { resumeText: trimmed.slice(0, MAX_RESUME_CHARS) });
+      setDetected(data);
+      setStatus('done');
+      onApply(data);
+    } catch (err) {
+      setStatus('error');
+      setError(err.response?.data?.error || 'Could not analyze that resume right now. Please try again shortly.');
+    }
+  }, [onApply]);
+
+  const handleFile = useCallback(async (file) => {
+    if (!file) return;
+    setFileName(file.name);
+    setDetected(null);
+    setStatus('reading');
+    setError('');
+    try {
+      const text = await extractResumeText(file);
+      await runAnalysis(text);
+    } catch (err) {
+      setStatus('error');
+      setError('Could not read that file. Try a PDF or .txt file, or paste the text directly.');
+    }
+  }, [runAnalysis]);
+
+  const reset = () => {
+    setStatus('idle');
+    setError('');
+    setFileName('');
+    setPastedText('');
+    setDetected(null);
+  };
+
+  const busy = status === 'reading' || status === 'analyzing';
+
+  return (
+    <div className="mb-6 rounded-2xl border border-[#6675F7]/20 bg-gradient-to-br from-[#6675F7]/5 to-transparent p-5">
+      <div className="flex items-start gap-3">
+        <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-[#6675F7]/10 text-[#4452c9]">
+          <Sparkles className="h-4 w-4" />
+        </div>
+        <div className="flex-1">
+          <h2 className="font-semibold text-gray-900">Fill from resume</h2>
+          <p className="mt-0.5 text-sm text-gray-600">
+            Upload a PDF or text resume and AI will suggest a role, skills, industries, and filters for you to review below.
+          </p>
+
+          {status === 'idle' && !showPaste && (
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition hover:border-[#6675F7]/40 hover:text-[#4452c9]">
+                <Upload className="h-4 w-4" />
+                Upload resume (PDF or .txt)
+                <input
+                  type="file"
+                  accept=".pdf,.txt,application/pdf,text/plain"
+                  className="hidden"
+                  onChange={(e) => handleFile(e.target.files?.[0])}
+                />
+              </label>
+              <button
+                type="button"
+                onClick={() => setShowPaste(true)}
+                className="text-sm font-medium text-[#4452c9] hover:underline"
+              >
+                or paste resume text instead
+              </button>
+            </div>
+          )}
+
+          {showPaste && status === 'idle' && (
+            <div className="mt-3 space-y-2">
+              <textarea
+                className="w-full rounded-lg border border-gray-200 bg-white p-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6675F7]/40 focus:border-[#6675F7]"
+                rows={6}
+                placeholder="Paste your resume text here…"
+                value={pastedText}
+                onChange={(e) => setPastedText(e.target.value)}
+              />
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => runAnalysis(pastedText)}
+                  disabled={!pastedText.trim()}
+                  className="inline-flex items-center gap-2 rounded-lg bg-[#6675F7] px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-[#4452c9] disabled:opacity-50"
+                >
+                  <Sparkles className="h-4 w-4" /> Analyze
+                </button>
+                <button type="button" onClick={() => setShowPaste(false)} className="text-sm text-gray-500 hover:text-gray-700">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+
+          {busy && (
+            <div className="mt-3 flex items-center gap-2 text-sm text-gray-600">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              {status === 'reading' ? `Reading ${fileName || 'your resume'}…` : 'Analyzing with AI…'}
+            </div>
+          )}
+
+          {status === 'error' && (
+            <div className="mt-3 flex items-start gap-2 rounded-lg border border-red-100 bg-red-50 p-3 text-sm text-red-700">
+              <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
+
+          {status === 'done' && detected && (
+            <div className="mt-3 rounded-lg border border-emerald-100 bg-emerald-50 p-3 text-sm text-emerald-800">
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                <div>
+                  <p className="font-medium">
+                    Detected{detected.role ? `: ${detected.role}` : ' your profile'} — filters below have been pre-filled. Review and adjust before searching.
+                  </p>
+                  {detected.skills?.length > 0 && (
+                    <p className="mt-1 text-emerald-700">Skills: {detected.skills.join(', ')}</p>
+                  )}
+                  {detected.industries?.length > 0 && (
+                    <p className="mt-0.5 text-emerald-700">Industries: {detected.industries.join(', ')}</p>
+                  )}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={reset}
+                className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-emerald-700 hover:underline"
+              >
+                <X className="h-3 w-3" /> Start over with a different resume
+              </button>
+            </div>
+          )}
+
+          {fileName && status !== 'idle' && (
+            <p className="mt-2 flex items-center gap-1.5 text-xs text-gray-400">
+              <FileText className="h-3 w-3" /> {fileName}
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function JobCard({ job }) {
@@ -171,6 +369,36 @@ function JobFinder() {
     [filters]
   );
 
+  const applyResumeFilters = useCallback((detected) => {
+    setFilters((f) => {
+      const next = { ...f };
+
+      if (detected.role) next.keywords = detected.role;
+      if (detected.skills?.length) next.skills = detected.skills.join(', ');
+
+      if (detected.industries?.length) {
+        const match = INDUSTRIES.find((i) => i.label.toLowerCase() === detected.industries[0].toLowerCase());
+        if (match) next.industry = match.value;
+      }
+
+      if (detected.workSetting && detected.workSetting !== 'any') next.workSetting = detected.workSetting;
+      if (detected.employmentType && detected.employmentType !== 'any') next.employmentType = detected.employmentType;
+
+      if (detected.location) {
+        const loc = detected.location.toLowerCase();
+        const match = LOCATIONS.find((l) => l.value && (loc.includes(l.value) || l.value.includes(loc)));
+        if (match) {
+          next.location = match.value;
+        } else {
+          next.location = 'custom';
+          next.customLocation = detected.location;
+        }
+      }
+
+      return next;
+    });
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 px-4 py-10 pt-28">
       <Helmet>
@@ -183,6 +411,8 @@ function JobFinder() {
           <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl">Job Finder</h1>
           <p className="mt-2 text-gray-600">Search recent postings across multiple job boards, filtered the way you like.</p>
         </div>
+
+        <ResumeUpload onApply={applyResumeFilters} />
 
         <form onSubmit={handleSearch} className="space-y-5 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
           <div className="grid gap-5 sm:grid-cols-2">
