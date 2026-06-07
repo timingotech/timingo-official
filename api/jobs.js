@@ -4,7 +4,44 @@
 // ("Cannot find module '/var/task/node_modules/axios/dist/node/axios.cjs'").
 // Native fetch needs no bundling at all, so this sidesteps the problem entirely.
 
-const FETCH_TIMEOUT_MS = 6000;
+const FETCH_TIMEOUT_MS = 5000;
+
+// With ~57 sources fetched in parallel, Vercel's runtime can throttle concurrent
+// outbound connections — so `Promise.allSettled` ends up bound by queued/serialized
+// per-source timeouts rather than true parallelism, and the whole function can blow
+// past the gateway's time limit (504 Gateway Timeout). A global budget guarantees we
+// always respond in time: whichever sources have answered by the deadline get used,
+// and any still in flight are treated as failed (their data just isn't included).
+const GLOBAL_BUDGET_MS = 8000;
+
+function settleWithBudget(promises, budgetMs) {
+  return new Promise((resolve) => {
+    const results = new Array(promises.length);
+    let remaining = promises.length;
+    if (remaining === 0) { resolve(results); return; }
+
+    const finish = () => {
+      clearTimeout(timer);
+      resolve(results);
+    };
+    const timer = setTimeout(() => {
+      for (let i = 0; i < results.length; i += 1) {
+        if (!results[i]) results[i] = { status: 'rejected', reason: new Error('Exceeded overall time budget') };
+      }
+      finish();
+    }, budgetMs);
+
+    promises.forEach((p, i) => {
+      p.then(
+        (value) => { results[i] = { status: 'fulfilled', value }; },
+        (reason) => { results[i] = { status: 'rejected', reason }; },
+      ).finally(() => {
+        remaining -= 1;
+        if (remaining === 0) finish();
+      });
+    });
+  });
+}
 
 async function fetchJson(url, options = {}) {
   const response = await fetch(url, { ...options, signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
@@ -344,7 +381,7 @@ export default async function handler(req, res) {
     : null;
 
   try {
-    const settled = await Promise.allSettled([
+    const settled = await settleWithBudget([
       fetchRemoteOK(),
       fetchArbeitnow(),
       fetchAdzuna({ what: [keywords, industryTerms].filter(Boolean).join(' '), location }),
@@ -353,7 +390,7 @@ export default async function handler(req, res) {
       fetchTheMuse(),
       fetchHimalayas(),
       ...COMPANIES.map(fetchCompanyJobs),
-    ]);
+    ], GLOBAL_BUDGET_MS);
 
     const sourceStatus = {};
     let jobs = [];

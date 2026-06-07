@@ -23,6 +23,17 @@ import {
 const COMPANY_NAME = 'Timingo Tech';
 const AUTH_KEY = 'timingo_reminders_auth';
 
+// Gateway-level errors (e.g. a 504 timeout) come back shaped like
+// { error: { code, message } } rather than { error: "some string" } — setting
+// that raw object as state and rendering it directly crashes React ("Objects
+// are not valid as a React child") and blanks the whole page. Always coerce to a string.
+function errorMessageFrom(err, fallback) {
+  const detail = err?.response?.data?.error;
+  if (typeof detail === 'string' && detail) return detail;
+  if (detail && typeof detail === 'object' && typeof detail.message === 'string') return detail.message;
+  return fallback;
+}
+
 const OFFSET_PRESETS = [
   { label: '1 day before', minutes: 1440 },
   { label: '1 hour before', minutes: 60 },
@@ -482,7 +493,7 @@ function RemindersDashboard() {
       const { data } = await axios.get('/api/reminders');
       setReminders(data.reminders || []);
     } catch (err) {
-      setError(err?.response?.data?.error || 'Could not load reminders.');
+      setError(errorMessageFrom(err, 'Could not load reminders.'));
     } finally {
       setLoading(false);
     }
@@ -517,7 +528,7 @@ function RemindersDashboard() {
       setNotice('Reminder created.');
       await load();
     } catch (err) {
-      setError(err?.response?.data?.error || 'Could not create reminder.');
+      setError(errorMessageFrom(err, 'Could not create reminder.'));
     } finally {
       setBusy(false);
     }
@@ -532,7 +543,7 @@ function RemindersDashboard() {
       setNotice('Reminder updated.');
       await load();
     } catch (err) {
-      setError(err?.response?.data?.error || 'Could not update reminder.');
+      setError(errorMessageFrom(err, 'Could not update reminder.'));
     } finally {
       setBusy(false);
     }
@@ -544,7 +555,7 @@ function RemindersDashboard() {
       await axios.patch('/api/reminders', { id: reminder.id, completed: !reminder.completed });
       await load();
     } catch (err) {
-      setError(err?.response?.data?.error || 'Could not update reminder.');
+      setError(errorMessageFrom(err, 'Could not update reminder.'));
     }
   };
 
@@ -556,7 +567,7 @@ function RemindersDashboard() {
       setNotice('Reminder deleted.');
       await load();
     } catch (err) {
-      setError(err?.response?.data?.error || 'Could not delete reminder.');
+      setError(errorMessageFrom(err, 'Could not delete reminder.'));
     }
   };
 

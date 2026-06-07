@@ -83,6 +83,18 @@ function timeAgoLabel(value) {
   return `${days}d ago`;
 }
 
+// Vercel's own gateway errors (e.g. a 504 timeout) come back shaped like
+// { error: { code, message } } rather than { error: "some string" } — if we set
+// that raw object as React state and render it directly, React throws ("Objects
+// are not valid as a React child") and the whole page goes blank. Always coerce
+// to a string before it reaches state.
+function errorMessageFrom(err, fallback) {
+  const detail = err?.response?.data?.error;
+  if (typeof detail === 'string' && detail) return detail;
+  if (detail && typeof detail === 'object' && typeof detail.message === 'string') return detail.message;
+  return fallback;
+}
+
 const MAX_RESUME_CHARS = 20000;
 
 // Loaded on demand — pdfjs-dist is sizeable, so we only pull it in when someone
@@ -137,7 +149,7 @@ function ResumeUpload({ onApply }) {
       onApply(data);
     } catch (err) {
       setStatus('error');
-      setError(err.response?.data?.error || 'Could not analyze that resume right now. Please try again shortly.');
+      setError(errorMessageFrom(err, 'Could not analyze that resume right now. Please try again shortly.'));
     }
   }, [onApply]);
 
@@ -360,7 +372,7 @@ function JobFinder() {
         });
         setJobs(data.jobs || []);
       } catch (err) {
-        setError(err.response?.data?.error || 'Could not fetch jobs right now. Please try again shortly.');
+        setError(errorMessageFrom(err, 'Could not fetch jobs right now. Please try again shortly.'));
         setJobs([]);
       } finally {
         setLoading(false);
