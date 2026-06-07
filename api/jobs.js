@@ -186,6 +186,134 @@ async function fetchHimalayas() {
   }));
 }
 
+// Pulls live openings straight from named employers' own public job-board APIs —
+// Greenhouse, Lever and Ashby all expose free, no-key JSON endpoints per company.
+// This is what gets us real listings from ~50 specific, recognizable companies
+// rather than relying solely on generic aggregators (which mostly cover remote roles).
+const MAX_JOBS_PER_COMPANY = 40;
+
+const COMPANIES = [
+  { name: 'Airbnb', platform: 'greenhouse', token: 'airbnb' },
+  { name: 'Stripe', platform: 'greenhouse', token: 'stripe' },
+  { name: 'GitLab', platform: 'greenhouse', token: 'gitlab' },
+  { name: 'Robinhood', platform: 'greenhouse', token: 'robinhood' },
+  { name: 'Discord', platform: 'greenhouse', token: 'discord' },
+  { name: 'Figma', platform: 'greenhouse', token: 'figma' },
+  { name: 'Asana', platform: 'greenhouse', token: 'asana' },
+  { name: 'Reddit', platform: 'greenhouse', token: 'reddit' },
+  { name: 'Pinterest', platform: 'greenhouse', token: 'pinterest' },
+  { name: 'Twitch', platform: 'greenhouse', token: 'twitch' },
+  { name: 'Instacart', platform: 'greenhouse', token: 'instacart' },
+  { name: 'Squarespace', platform: 'greenhouse', token: 'squarespace' },
+  { name: 'Cloudflare', platform: 'greenhouse', token: 'cloudflare' },
+  { name: 'Elastic', platform: 'greenhouse', token: 'elastic' },
+  { name: 'MongoDB', platform: 'greenhouse', token: 'mongodb' },
+  { name: 'Gusto', platform: 'greenhouse', token: 'gusto' },
+  { name: 'Brex', platform: 'greenhouse', token: 'brex' },
+  { name: 'Affirm', platform: 'greenhouse', token: 'affirm' },
+  { name: 'Lyft', platform: 'greenhouse', token: 'lyft' },
+  { name: 'Databricks', platform: 'greenhouse', token: 'databricks' },
+  { name: 'Samsara', platform: 'greenhouse', token: 'samsara' },
+  { name: 'Webflow', platform: 'greenhouse', token: 'webflow' },
+  { name: 'Vercel', platform: 'greenhouse', token: 'vercel' },
+  { name: 'Carta', platform: 'greenhouse', token: 'carta' },
+  { name: 'Chime', platform: 'greenhouse', token: 'chime' },
+  { name: 'Flexport', platform: 'greenhouse', token: 'flexport' },
+  { name: 'Mixpanel', platform: 'greenhouse', token: 'mixpanel' },
+  { name: 'Scale AI', platform: 'greenhouse', token: 'scaleai' },
+  { name: 'SoFi', platform: 'greenhouse', token: 'sofi' },
+  { name: 'Toast', platform: 'greenhouse', token: 'toast' },
+  { name: 'Duolingo', platform: 'greenhouse', token: 'duolingo' },
+  { name: 'Dropbox', platform: 'greenhouse', token: 'dropbox' },
+  { name: 'Okta', platform: 'greenhouse', token: 'okta' },
+  { name: 'Twilio', platform: 'greenhouse', token: 'twilio' },
+  { name: 'Intercom', platform: 'greenhouse', token: 'intercom' },
+  { name: 'Algolia', platform: 'greenhouse', token: 'algolia' },
+  { name: 'Anthropic', platform: 'greenhouse', token: 'anthropic' },
+  { name: 'Peloton', platform: 'greenhouse', token: 'peloton' },
+  { name: 'New Relic', platform: 'greenhouse', token: 'newrelic' },
+  { name: 'PagerDuty', platform: 'greenhouse', token: 'pagerduty' },
+  { name: 'Udemy', platform: 'greenhouse', token: 'udemy' },
+  { name: 'Ramp', platform: 'ashby', token: 'ramp' },
+  { name: 'Linear', platform: 'ashby', token: 'linear' },
+  { name: 'OpenAI', platform: 'ashby', token: 'openai' },
+  { name: 'Substack', platform: 'ashby', token: 'substack' },
+  { name: 'Vanta', platform: 'ashby', token: 'vanta' },
+  { name: 'Deel', platform: 'ashby', token: 'deel' },
+  { name: 'Notion', platform: 'ashby', token: 'notion' },
+  { name: 'Outreach', platform: 'lever', token: 'outreach' },
+  { name: 'Tala', platform: 'lever', token: 'tala' },
+];
+
+function stripHtml(html) {
+  return String(html || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+async function fetchGreenhouseCompany({ name, token }) {
+  const data = await fetchJson(`https://boards-api.greenhouse.io/v1/boards/${token}/jobs?content=true`);
+  const jobs = Array.isArray(data?.jobs) ? data.jobs : [];
+  return jobs.slice(0, MAX_JOBS_PER_COMPANY).map((job) => ({
+    id: `gh-${token}-${job.id}`,
+    title: job.title || 'Untitled role',
+    company: name,
+    location: job.location?.name || '',
+    remote: /remote/i.test(job.location?.name || ''),
+    jobType: null,
+    tags: [],
+    description: stripHtml(job.content),
+    postedAt: job.updated_at ? new Date(job.updated_at) : null,
+    url: job.absolute_url || null,
+    source: name,
+  }));
+}
+
+async function fetchLeverCompany({ name, token }) {
+  const data = await fetchJson(`https://api.lever.co/v0/postings/${token}?mode=json`);
+  const jobs = Array.isArray(data) ? data : [];
+  return jobs.slice(0, MAX_JOBS_PER_COMPANY).map((job) => ({
+    id: `lever-${token}-${job.id}`,
+    title: job.text || 'Untitled role',
+    company: name,
+    location: job.categories?.location || '',
+    remote: /remote/i.test(job.categories?.location || ''),
+    jobType: job.categories?.commitment || null,
+    tags: job.categories?.team ? [job.categories.team] : [],
+    description: stripHtml(job.descriptionPlain || job.description),
+    postedAt: job.createdAt ? new Date(job.createdAt) : null,
+    url: job.hostedUrl || null,
+    source: name,
+  }));
+}
+
+async function fetchAshbyCompany({ name, token }) {
+  const data = await fetchJson(`https://api.ashbyhq.com/posting-api/job-board/${token}`);
+  const jobs = Array.isArray(data?.jobs) ? data.jobs : [];
+  return jobs.slice(0, MAX_JOBS_PER_COMPANY).map((job) => ({
+    id: `ashby-${token}-${job.id}`,
+    title: job.title || 'Untitled role',
+    company: name,
+    location: job.location || '',
+    remote: !!job.isRemote || /remote/i.test(job.location || ''),
+    jobType: job.employmentType || null,
+    tags: [],
+    description: stripHtml(job.descriptionPlain),
+    postedAt: job.publishedAt ? new Date(job.publishedAt) : null,
+    url: job.jobUrl || job.applyUrl || null,
+    source: name,
+  }));
+}
+
+const COMPANY_FETCHERS = {
+  greenhouse: fetchGreenhouseCompany,
+  lever: fetchLeverCompany,
+  ashby: fetchAshbyCompany,
+};
+
+function fetchCompanyJobs(company) {
+  const fetcher = COMPANY_FETCHERS[company.platform];
+  return fetcher ? fetcher(company) : Promise.resolve([]);
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -224,19 +352,39 @@ export default async function handler(req, res) {
       fetchJobicy(),
       fetchTheMuse(),
       fetchHimalayas(),
+      ...COMPANIES.map(fetchCompanyJobs),
     ]);
 
     const sourceStatus = {};
     let jobs = [];
+    let companiesResponding = 0;
+    let companiesJobCount = 0;
+
     settled.forEach((result, i) => {
-      const name = SOURCE_NAMES[i];
+      if (i < SOURCE_NAMES.length) {
+        const name = SOURCE_NAMES[i];
+        if (result.status === 'fulfilled') {
+          sourceStatus[name] = { ok: true, count: result.value.length };
+          jobs = jobs.concat(result.value);
+        } else {
+          sourceStatus[name] = { ok: false, error: result.reason?.message || 'Failed to fetch' };
+        }
+        return;
+      }
+
       if (result.status === 'fulfilled') {
-        sourceStatus[name] = { ok: true, count: result.value.length };
+        companiesResponding += 1;
+        companiesJobCount += result.value.length;
         jobs = jobs.concat(result.value);
-      } else {
-        sourceStatus[name] = { ok: false, error: result.reason?.message || 'Failed to fetch' };
       }
     });
+
+    sourceStatus['Company boards'] = {
+      ok: companiesResponding > 0,
+      count: companiesJobCount,
+      checked: COMPANIES.length,
+      responding: companiesResponding,
+    };
 
     const filtered = jobs.filter((job) => {
       const haystack = `${job.title} ${job.company} ${job.tags.join(' ')} ${job.description}`;
