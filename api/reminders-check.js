@@ -31,7 +31,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: error.message });
   }
 
-  let emailsSent = 0;
+  let notificationsSent = 0;
 
   for (const reminder of reminders || []) {
     const dueAt = new Date(reminder.due_at);
@@ -46,7 +46,7 @@ export default async function handler(req, res) {
         // eslint-disable-next-line no-await-in-loop
         await sendReminderEmail(resend, reminder, offsetMinutes);
         newlySent.push(offsetMinutes);
-        emailsSent += 1;
+        notificationsSent += 1;
       }
     }
 
@@ -55,7 +55,7 @@ export default async function handler(req, res) {
       // eslint-disable-next-line no-await-in-loop
       await sendReminderEmail(resend, reminder, 0);
       newlySent.push(0);
-      emailsSent += 1;
+      notificationsSent += 1;
     }
 
     if (newlySent.length) {
@@ -67,7 +67,7 @@ export default async function handler(req, res) {
     }
   }
 
-  return res.status(200).json({ ok: true, checked: (reminders || []).length, emailsSent });
+  return res.status(200).json({ ok: true, checked: (reminders || []).length, notificationsSent });
 }
 
 function describeOffset(offsetMinutes) {
@@ -84,25 +84,40 @@ function describeOffset(offsetMinutes) {
 }
 
 async function sendReminderEmail(resend, reminder, offsetMinutes) {
-  const dueLabel = new Date(reminder.due_at).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+  // Note: `dateStyle`/`timeStyle` can't be combined with `timeZoneName` (Intl throws), so spell out the parts.
+  const dueLabel = new Date(reminder.due_at).toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZoneName: 'short',
+  });
   const when = describeOffset(offsetMinutes);
+  const emails = reminder.person_emails || [];
+  const names = reminder.person_names || [];
 
-  try {
-    await resend.emails.send({
-      from: `${process.env.FROM_NAME || 'TimingoTech Reminders'} <${process.env.FROM_EMAIL}>`,
-      to: reminder.person_email,
-      subject: offsetMinutes === 0
-        ? `Due now: ${reminder.title}`
-        : `Reminder (${when}): ${reminder.title}`,
-      html: `<p>Hi ${reminder.person_name},</p>
-        <p>This is a reminder for <strong>${reminder.company}</strong>${offsetMinutes === 0 ? ', due right now' : `, due ${when}`}:</p>
-        <h3 style="margin: 8px 0;">${reminder.title}</h3>
-        ${reminder.notes ? `<p>${reminder.notes}</p>` : ''}
-        <p><strong>Due:</strong> ${dueLabel}</p>
-        <p style="color:#888; font-size: 12px;">Sent by Timingo Tech Reminders</p>
-      `,
-    });
-  } catch (err) {
-    console.error(`Failed to send reminder email for ${reminder.id} (offset ${offsetMinutes}):`, err);
-  }
+  await Promise.all(
+    emails.map(async (email, i) => {
+      const name = names[i] || email;
+      try {
+        await resend.emails.send({
+          from: `${process.env.FROM_NAME || 'TimingoTech Reminders'} <${process.env.FROM_EMAIL}>`,
+          to: email,
+          subject: offsetMinutes === 0
+            ? `Due now: ${reminder.title}`
+            : `Reminder (${when}): ${reminder.title}`,
+          html: `<p>Hi ${name},</p>
+            <p>This is a reminder for <strong>${reminder.company}</strong>${offsetMinutes === 0 ? ', due right now' : `, due ${when}`}:</p>
+            <h3 style="margin: 8px 0;">${reminder.title}</h3>
+            ${reminder.notes ? `<p>${reminder.notes}</p>` : ''}
+            <p><strong>Due:</strong> ${dueLabel}</p>
+            <p style="color:#888; font-size: 12px;">Sent by Timingo Tech Reminders</p>
+          `,
+        });
+      } catch (err) {
+        console.error(`Failed to send reminder email to ${email} for ${reminder.id} (offset ${offsetMinutes}):`, err);
+      }
+    })
+  );
 }

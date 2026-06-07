@@ -6,8 +6,8 @@ function getClient() {
 
 const UPDATABLE_FIELDS = [
   'company',
-  'person_name',
-  'person_email',
+  'person_names',
+  'person_emails',
   'title',
   'notes',
   'due_at',
@@ -42,10 +42,13 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'POST') {
-      const { company, person_name, person_email, title, notes, due_at, remind_offsets_minutes } = req.body || {};
+      const { company, person_names, person_emails, title, notes, due_at, remind_offsets_minutes } = req.body || {};
 
-      if (!company || !person_name || !person_email || !title || !due_at) {
-        return res.status(400).json({ error: 'Missing required fields: company, person_name, person_email, title, due_at' });
+      const emails = Array.isArray(person_emails) ? person_emails.map((e) => String(e).trim()).filter(Boolean) : [];
+      const names = Array.isArray(person_names) ? person_names.map((n) => String(n).trim()).filter(Boolean) : [];
+
+      if (!company || !title || !due_at || emails.length === 0) {
+        return res.status(400).json({ error: 'Missing required fields: company, title, due_at, and at least one recipient email' });
       }
 
       const offsets = Array.isArray(remind_offsets_minutes) && remind_offsets_minutes.length
@@ -56,8 +59,8 @@ export default async function handler(req, res) {
         .from('reminders')
         .insert({
           company,
-          person_name,
-          person_email,
+          person_names: names,
+          person_emails: emails,
           title,
           notes: notes || null,
           due_at,
@@ -80,6 +83,20 @@ export default async function handler(req, res) {
       }
       if (Object.keys(patch).length === 0) {
         return res.status(400).json({ error: 'No updatable fields provided' });
+      }
+
+      if ('person_emails' in patch) {
+        patch.person_emails = Array.isArray(patch.person_emails)
+          ? patch.person_emails.map((e) => String(e).trim()).filter(Boolean)
+          : [];
+        if (patch.person_emails.length === 0) {
+          return res.status(400).json({ error: 'At least one recipient email is required' });
+        }
+      }
+      if ('person_names' in patch) {
+        patch.person_names = Array.isArray(patch.person_names)
+          ? patch.person_names.map((n) => String(n).trim()).filter(Boolean)
+          : [];
       }
 
       // Changing the due date means past notifications no longer apply — let them fire again on the new schedule

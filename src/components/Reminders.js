@@ -1,6 +1,22 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
 import axios from 'axios';
+import {
+  Bell,
+  Building2,
+  Users,
+  Calendar,
+  Clock,
+  CheckCircle2,
+  Circle,
+  Pencil,
+  Trash2,
+  Plus,
+  LogOut,
+  Search,
+  AlertCircle,
+  X,
+} from 'lucide-react';
 
 const COMPANY_NAME = 'Timingo Tech';
 const AUTH_KEY = 'timingo_reminders_auth';
@@ -18,13 +34,20 @@ const DEFAULT_OFFSETS = [1440, 60, 10, 5];
 
 const emptyForm = {
   company: '',
-  person_name: '',
-  person_email: '',
+  person_names: '',
+  person_emails: '',
   title: '',
   notes: '',
   due_at: '',
   remind_offsets_minutes: DEFAULT_OFFSETS,
 };
+
+function parseList(value) {
+  return value
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
 
 function toDatetimeLocal(value) {
   if (!value) return '';
@@ -33,17 +56,46 @@ function toDatetimeLocal(value) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-function timeUntilLabel(dueAt, completed) {
-  if (completed) return 'Completed';
-  const diffMs = new Date(dueAt).getTime() - Date.now();
-  if (diffMs <= 0) return 'Overdue';
-  const minutes = Math.round(diffMs / 60000);
-  if (minutes < 60) return `In ${minutes} minute${minutes === 1 ? '' : 's'}`;
-  const hours = Math.round(minutes / 60);
-  if (hours < 48) return `In ${hours} hour${hours === 1 ? '' : 's'}`;
-  const days = Math.round(hours / 24);
-  return `In ${days} day${days === 1 ? '' : 's'}`;
+function formatDateTime(value) {
+  // Note: `dateStyle`/`timeStyle` can't be combined with `timeZoneName` (Intl throws), so spell out the parts.
+  return new Date(value).toLocaleString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZoneName: 'short',
+  });
 }
+
+function recipientLabels(reminder) {
+  const names = reminder.person_names || [];
+  const emails = reminder.person_emails || [];
+  return emails.map((email, i) => names[i] || email);
+}
+
+function timeUntilLabel(dueAt, completed) {
+  if (completed) return { text: 'Completed', tone: 'done' };
+  const diffMs = new Date(dueAt).getTime() - Date.now();
+  if (diffMs <= 0) return { text: 'Overdue', tone: 'overdue' };
+  const minutes = Math.round(diffMs / 60000);
+  if (minutes < 60) return { text: `In ${minutes} minute${minutes === 1 ? '' : 's'}`, tone: 'soon' };
+  const hours = Math.round(minutes / 60);
+  if (hours < 48) return { text: `In ${hours} hour${hours === 1 ? '' : 's'}`, tone: hours <= 6 ? 'soon' : 'upcoming' };
+  const days = Math.round(hours / 24);
+  return { text: `In ${days} day${days === 1 ? '' : 's'}`, tone: 'upcoming' };
+}
+
+const TONE_STYLES = {
+  done: 'bg-gray-100 text-gray-500',
+  overdue: 'bg-red-50 text-red-600',
+  soon: 'bg-amber-50 text-amber-700',
+  upcoming: 'bg-emerald-50 text-emerald-700',
+};
+
+const inputClasses =
+  'w-full px-3.5 py-2.5 text-sm bg-white border border-gray-200 rounded-lg shadow-sm transition focus:outline-none focus:ring-2 focus:ring-[#6675F7]/40 focus:border-[#6675F7]';
+const labelClasses = 'block mb-1.5 text-sm font-medium text-gray-700';
 
 function GateForm({ onSuccess }) {
   const [username, setUsername] = useState('');
@@ -63,34 +115,44 @@ function GateForm({ onSuccess }) {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[#F7F7FA] px-4 pt-28">
+    <div className="flex items-center justify-center min-h-screen px-4 py-10 bg-gradient-to-br from-gray-50 via-white to-blue-50">
       <Helmet>
         <title>Reminders — Internal | Timingo Tech</title>
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
-      <form onSubmit={handleSubmit} className="w-full max-w-sm p-8 bg-white rounded-lg shadow-md">
-        <h1 className="mb-2 text-2xl font-bold text-center hometext-gradient">Internal Reminders</h1>
+      <form onSubmit={handleSubmit} className="w-full max-w-sm p-8 bg-white border border-gray-100 shadow-xl rounded-2xl">
+        <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-gradient-to-r from-[#F7666F] to-[#6675F7]">
+          <Bell className="w-6 h-6 text-white" />
+        </div>
+        <h1 className="mb-1 text-2xl font-bold text-center hometext-gradient">Internal Reminders</h1>
         <p className="mb-6 text-sm text-center text-gray-500">Sign in to manage reminders</p>
-        <label className="block mb-1 text-sm font-medium text-gray-700">Login</label>
+        <label className={labelClasses}>Login</label>
         <input
           type="text"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          className="w-full px-3 py-2 mb-4 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className={`${inputClasses} mb-4`}
           placeholder="Company name"
           autoComplete="username"
         />
-        <label className="block mb-1 text-sm font-medium text-gray-700">Password</label>
+        <label className={labelClasses}>Password</label>
         <input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full px-3 py-2 mb-4 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className={`${inputClasses} mb-4`}
           placeholder="Company name"
           autoComplete="current-password"
         />
-        {error && <p className="mb-3 text-sm text-red-500">{error}</p>}
-        <button type="submit" className="w-full px-4 py-2 font-semibold text-white rounded support-gradient">
+        {error && (
+          <p className="flex items-center gap-1.5 mb-3 text-sm text-red-500">
+            <AlertCircle className="w-4 h-4 shrink-0" /> {error}
+          </p>
+        )}
+        <button
+          type="submit"
+          className="w-full px-4 py-2.5 font-semibold text-white transition rounded-lg bg-gradient-to-r from-[#F7666F] to-[#6675F7] hover:opacity-90"
+        >
           Sign in
         </button>
       </form>
@@ -108,18 +170,25 @@ function OffsetPicker({ value, onChange }) {
   };
 
   return (
-    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-      {OFFSET_PRESETS.map((preset) => (
-        <label key={preset.minutes} className="flex items-center gap-2 text-sm text-gray-700">
-          <input
-            type="checkbox"
-            checked={value.includes(preset.minutes)}
-            onChange={() => toggle(preset.minutes)}
-            className="w-4 h-4"
-          />
-          {preset.label}
-        </label>
-      ))}
+    <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+      {OFFSET_PRESETS.map((preset) => {
+        const active = value.includes(preset.minutes);
+        return (
+          <button
+            type="button"
+            key={preset.minutes}
+            onClick={() => toggle(preset.minutes)}
+            className={`flex items-center gap-2 px-3 py-2 text-sm font-medium border rounded-lg transition ${
+              active
+                ? 'border-[#6675F7] bg-[#6675F7]/10 text-[#4452c9]'
+                : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            {active ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : <Circle className="w-4 h-4 shrink-0 text-gray-300" />}
+            {preset.label}
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -138,78 +207,96 @@ function ReminderForm({ initialValues, submitLabel, onSubmit, onCancel, busy }) 
     onSubmit(form);
   };
 
+  const nameCount = parseList(form.person_names).length;
+  const emailCount = parseList(form.person_emails).length;
+  const countMismatch = nameCount > 0 && emailCount > 0 && nameCount !== emailCount;
+
   return (
-    <form onSubmit={handleSubmit} className="grid gap-4 p-6 bg-white rounded-lg shadow-md sm:grid-cols-2">
+    <form onSubmit={handleSubmit} className="grid gap-5 p-6 bg-white border border-gray-100 shadow-md rounded-2xl sm:p-7 sm:grid-cols-2">
       <div>
-        <label className="block mb-1 text-sm font-medium text-gray-700">Company</label>
+        <label className={labelClasses}>Company</label>
         <input
           required
           value={form.company}
           onChange={(e) => update('company', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded"
+          className={inputClasses}
           placeholder="e.g. Acme Ltd"
         />
       </div>
       <div>
-        <label className="block mb-1 text-sm font-medium text-gray-700">Title</label>
+        <label className={labelClasses}>Title</label>
         <input
           required
           value={form.title}
           onChange={(e) => update('title', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded"
+          className={inputClasses}
           placeholder="e.g. Send proposal follow-up"
         />
       </div>
       <div>
-        <label className="block mb-1 text-sm font-medium text-gray-700">Person's name</label>
+        <label className={labelClasses}>Recipient name(s)</label>
         <input
           required
-          value={form.person_name}
-          onChange={(e) => update('person_name', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded"
-          placeholder="Who this is for"
+          value={form.person_names}
+          onChange={(e) => update('person_names', e.target.value)}
+          className={inputClasses}
+          placeholder="e.g. Alice, Bob"
         />
+        <p className="mt-1 text-xs text-gray-400">Separate multiple names with commas, in the same order as the emails.</p>
       </div>
       <div>
-        <label className="block mb-1 text-sm font-medium text-gray-700">Person's email</label>
+        <label className={labelClasses}>Recipient email(s)</label>
         <input
           required
-          type="email"
-          value={form.person_email}
-          onChange={(e) => update('person_email', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded"
-          placeholder="Where to send the reminder emails"
+          value={form.person_emails}
+          onChange={(e) => update('person_emails', e.target.value)}
+          className={inputClasses}
+          placeholder="e.g. alice@acme.com, bob@acme.com"
         />
+        {countMismatch && (
+          <p className="flex items-center gap-1.5 mt-1 text-xs text-amber-600">
+            <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+            {nameCount} name{nameCount === 1 ? '' : 's'} but {emailCount} email{emailCount === 1 ? '' : 's'} — they'll be matched in order, extras fall back to the email address.
+          </p>
+        )}
       </div>
       <div>
-        <label className="block mb-1 text-sm font-medium text-gray-700">Due date &amp; time</label>
+        <label className={labelClasses}>Due date &amp; time</label>
         <input
           required
           type="datetime-local"
           value={form.due_at}
           onChange={(e) => update('due_at', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded"
+          className={inputClasses}
         />
+        {form.due_at ? (
+          <p className="flex items-center gap-1.5 mt-1.5 text-xs font-medium text-[#4452c9]">
+            <Calendar className="w-3.5 h-3.5 shrink-0" />
+            Scheduled for {formatDateTime(form.due_at)}
+          </p>
+        ) : (
+          <p className="mt-1 text-xs text-gray-400">Picked in your own time zone — reminder emails are timed against this exact moment.</p>
+        )}
       </div>
       <div className="sm:col-span-2">
-        <label className="block mb-1 text-sm font-medium text-gray-700">Notes (optional)</label>
+        <label className={labelClasses}>Notes (optional)</label>
         <textarea
           value={form.notes}
           onChange={(e) => update('notes', e.target.value)}
           rows={2}
-          className="w-full px-3 py-2 border border-gray-300 rounded"
+          className={inputClasses}
           placeholder="Any extra context to include in the reminder email"
         />
       </div>
       <div className="sm:col-span-2">
-        <label className="block mb-2 text-sm font-medium text-gray-700">Send email reminders</label>
+        <label className={labelClasses}>Send email reminders</label>
         <OffsetPicker value={form.remind_offsets_minutes} onChange={(v) => update('remind_offsets_minutes', v)} />
       </div>
       <div className="flex gap-3 sm:col-span-2">
         <button
           type="submit"
           disabled={busy}
-          className="px-5 py-2 font-semibold text-white rounded support-gradient disabled:opacity-60"
+          className="px-5 py-2.5 font-semibold text-white transition rounded-lg bg-gradient-to-r from-[#F7666F] to-[#6675F7] hover:opacity-90 disabled:opacity-60"
         >
           {busy ? 'Saving…' : submitLabel}
         </button>
@@ -217,7 +304,7 @@ function ReminderForm({ initialValues, submitLabel, onSubmit, onCancel, busy }) 
           <button
             type="button"
             onClick={onCancel}
-            className="px-5 py-2 font-semibold text-gray-600 border border-gray-300 rounded"
+            className="px-5 py-2.5 font-semibold text-gray-600 transition border border-gray-200 rounded-lg hover:bg-gray-50"
           >
             Cancel
           </button>
@@ -228,35 +315,67 @@ function ReminderForm({ initialValues, submitLabel, onSubmit, onCancel, busy }) 
 }
 
 function ReminderCard({ reminder, onEdit, onDelete, onToggleCompleted }) {
-  const dueLabel = new Date(reminder.due_at).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
   const status = timeUntilLabel(reminder.due_at, reminder.completed);
-  const overdue = !reminder.completed && new Date(reminder.due_at).getTime() < Date.now();
+  const recipients = recipientLabels(reminder);
 
   return (
-    <div className={`p-5 bg-white rounded-lg shadow-md ${reminder.completed ? 'opacity-60' : ''}`}>
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <p className="text-xs font-semibold tracking-wide text-gray-400 uppercase">{reminder.company}</p>
-          <h3 className="text-lg font-semibold text-gray-800">{reminder.title}</h3>
-          <p className="text-sm text-gray-500">For {reminder.person_name} · {reminder.person_email}</p>
-          {reminder.notes && <p className="mt-2 text-sm text-gray-600">{reminder.notes}</p>}
+    <div className={`p-5 sm:p-6 bg-white border border-gray-100 rounded-2xl shadow-sm transition hover:shadow-md ${reminder.completed ? 'opacity-60' : ''}`}>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="min-w-0">
+          <div className="flex items-center gap-1.5 text-xs font-semibold tracking-wide text-gray-400 uppercase">
+            <Building2 className="w-3.5 h-3.5" />
+            {reminder.company}
+          </div>
+          <h3 className="mt-1 text-lg font-semibold text-gray-800">{reminder.title}</h3>
+          <div className="flex items-start gap-1.5 mt-1.5 text-sm text-gray-500">
+            <Users className="w-4 h-4 mt-0.5 shrink-0 text-gray-400" />
+            <span className="break-words">{recipients.join(', ') || '—'}</span>
+          </div>
+          {reminder.notes && <p className="mt-2.5 text-sm text-gray-600">{reminder.notes}</p>}
         </div>
-        <div className="text-right">
-          <p className={`text-sm font-semibold ${overdue ? 'text-red-500' : 'text-gray-700'}`}>{status}</p>
-          <p className="text-xs text-gray-400">{dueLabel}</p>
+        <div className="text-right shrink-0">
+          <span className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full ${TONE_STYLES[status.tone]}`}>
+            {status.tone === 'overdue' ? <AlertCircle className="w-3.5 h-3.5" /> : <Clock className="w-3.5 h-3.5" />}
+            {status.text}
+          </span>
+          <p className="flex items-center justify-end gap-1.5 mt-2 text-xs text-gray-400">
+            <Calendar className="w-3.5 h-3.5" />
+            {formatDateTime(reminder.due_at)}
+          </p>
         </div>
       </div>
-      <div className="flex flex-wrap items-center gap-3 mt-4 text-sm">
-        <label className="flex items-center gap-2 text-gray-600">
-          <input type="checkbox" checked={reminder.completed} onChange={onToggleCompleted} className="w-4 h-4" />
-          Completed
-        </label>
-        <button onClick={onEdit} className="px-3 py-1 text-gray-600 border border-gray-300 rounded hover:bg-gray-50">
-          Edit
+      <div className="flex flex-wrap items-center gap-2 pt-4 mt-4 text-sm border-t border-gray-100">
+        <button
+          onClick={onToggleCompleted}
+          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition ${
+            reminder.completed
+              ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+              : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+          }`}
+        >
+          {reminder.completed ? <CheckCircle2 className="w-4 h-4" /> : <Circle className="w-4 h-4" />}
+          {reminder.completed ? 'Completed' : 'Mark complete'}
         </button>
-        <button onClick={onDelete} className="px-3 py-1 text-red-500 border border-red-200 rounded hover:bg-red-50">
-          Delete
+        <button onClick={onEdit} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-gray-600 transition border border-gray-200 rounded-lg hover:bg-gray-50">
+          <Pencil className="w-4 h-4" /> Edit
         </button>
+        <button onClick={onDelete} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-red-500 transition border border-red-200 rounded-lg hover:bg-red-50">
+          <Trash2 className="w-4 h-4" /> Delete
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function StatPill({ icon: Icon, label, value, tone }) {
+  return (
+    <div className="flex items-center gap-3 px-4 py-3 bg-white border border-gray-100 shadow-sm rounded-xl">
+      <span className={`flex items-center justify-center w-9 h-9 rounded-lg ${tone}`}>
+        <Icon className="w-4.5 h-4.5" />
+      </span>
+      <div>
+        <p className="text-lg font-semibold leading-none text-gray-800">{value}</p>
+        <p className="text-xs text-gray-400">{label}</p>
       </div>
     </div>
   );
@@ -289,13 +408,27 @@ function RemindersDashboard() {
     load();
   }, [load]);
 
-  const withDueAtIso = (form) => ({ ...form, due_at: new Date(form.due_at).toISOString() });
+  useEffect(() => {
+    if (!notice) return;
+    const t = setTimeout(() => setNotice(''), 4000);
+    return () => clearTimeout(t);
+  }, [notice]);
+
+  const buildPayload = (form) => ({
+    company: form.company.trim(),
+    title: form.title.trim(),
+    notes: form.notes.trim(),
+    person_names: parseList(form.person_names),
+    person_emails: parseList(form.person_emails),
+    due_at: new Date(form.due_at).toISOString(),
+    remind_offsets_minutes: form.remind_offsets_minutes,
+  });
 
   const handleCreate = async (form) => {
     setBusy(true);
     setError('');
     try {
-      await axios.post('/api/reminders', withDueAtIso(form));
+      await axios.post('/api/reminders', buildPayload(form));
       setShowForm(false);
       setNotice('Reminder created.');
       await load();
@@ -310,7 +443,7 @@ function RemindersDashboard() {
     setBusy(true);
     setError('');
     try {
-      await axios.patch('/api/reminders', { id, ...withDueAtIso(form) });
+      await axios.patch('/api/reminders', { id, ...buildPayload(form) });
       setEditingId(null);
       setNotice('Reminder updated.');
       await load();
@@ -348,43 +481,87 @@ function RemindersDashboard() {
     window.location.reload();
   };
 
-  const filtered = companyFilter
-    ? reminders.filter((r) => r.company.toLowerCase().includes(companyFilter.toLowerCase()))
-    : reminders;
+  const filtered = useMemo(
+    () =>
+      companyFilter
+        ? reminders.filter((r) => r.company.toLowerCase().includes(companyFilter.toLowerCase()))
+        : reminders,
+    [reminders, companyFilter]
+  );
+
+  const stats = useMemo(() => {
+    const now = Date.now();
+    let overdue = 0;
+    let upcoming = 0;
+    let completed = 0;
+    for (const r of reminders) {
+      if (r.completed) completed += 1;
+      else if (new Date(r.due_at).getTime() < now) overdue += 1;
+      else upcoming += 1;
+    }
+    return { overdue, upcoming, completed };
+  }, [reminders]);
 
   return (
-    <div className="min-h-screen px-4 pt-28 pb-10 bg-[#F7F7FA]">
+    <div className="min-h-screen px-4 py-10 bg-gradient-to-br from-gray-50 via-white to-blue-50">
       <Helmet>
         <title>Reminders — Internal | Timingo Tech</title>
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
       <div className="max-w-4xl mx-auto">
+        <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
+          <div className="flex items-center gap-3">
+            <span className="flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-r from-[#F7666F] to-[#6675F7]">
+              <Bell className="w-5 h-5 text-white" />
+            </span>
+            <div>
+              <h1 className="text-2xl font-bold leading-tight hometext-gradient">Internal Reminders</h1>
+              <p className="text-sm text-gray-500">Track follow-ups and nudge people by email before they're due.</p>
+            </div>
+          </div>
+          <button onClick={signOut} className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-gray-500 transition border border-gray-200 rounded-lg hover:bg-gray-50">
+            <LogOut className="w-4 h-4" /> Sign out
+          </button>
+        </div>
+
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          <StatPill icon={Clock} label="Upcoming" value={stats.upcoming} tone="bg-[#6675F7]/10 text-[#4452c9]" />
+          <StatPill icon={AlertCircle} label="Overdue" value={stats.overdue} tone="bg-red-50 text-red-500" />
+          <StatPill icon={CheckCircle2} label="Completed" value={stats.completed} tone="bg-emerald-50 text-emerald-600" />
+        </div>
+
         <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-          <h1 className="text-2xl font-bold hometext-gradient">Internal Reminders</h1>
-          <div className="flex flex-wrap gap-3">
+          <div className="relative">
+            <Search className="absolute w-4 h-4 text-gray-400 -translate-y-1/2 left-3 top-1/2" />
             <input
               value={companyFilter}
               onChange={(e) => setCompanyFilter(e.target.value)}
               placeholder="Filter by company…"
-              className="px-3 py-2 text-sm border border-gray-300 rounded"
+              className={`${inputClasses} pl-9 w-56`}
             />
-            <button
-              onClick={() => {
-                setShowForm((s) => !s);
-                setEditingId(null);
-              }}
-              className="px-4 py-2 text-sm font-semibold text-white rounded support-gradient"
-            >
-              {showForm ? 'Close' : '+ New reminder'}
-            </button>
-            <button onClick={signOut} className="px-4 py-2 text-sm font-semibold text-gray-600 border border-gray-300 rounded">
-              Sign out
-            </button>
           </div>
+          <button
+            onClick={() => {
+              setShowForm((s) => !s);
+              setEditingId(null);
+            }}
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold text-white transition rounded-lg bg-gradient-to-r from-[#F7666F] to-[#6675F7] hover:opacity-90"
+          >
+            {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+            {showForm ? 'Close' : 'New reminder'}
+          </button>
         </div>
 
-        {notice && <p className="mb-4 text-sm text-green-600">{notice}</p>}
-        {error && <p className="mb-4 text-sm text-red-500">{error}</p>}
+        {notice && (
+          <p className="flex items-center gap-1.5 px-4 py-2.5 mb-4 text-sm rounded-lg text-emerald-700 bg-emerald-50">
+            <CheckCircle2 className="w-4 h-4 shrink-0" /> {notice}
+          </p>
+        )}
+        {error && (
+          <p className="flex items-center gap-1.5 px-4 py-2.5 mb-4 text-sm text-red-600 rounded-lg bg-red-50">
+            <AlertCircle className="w-4 h-4 shrink-0" /> {error}
+          </p>
+        )}
 
         {showForm && (
           <div className="mb-8">
@@ -393,9 +570,12 @@ function RemindersDashboard() {
         )}
 
         {loading ? (
-          <p className="text-center text-gray-500">Loading reminders…</p>
+          <p className="py-12 text-center text-gray-500">Loading reminders…</p>
         ) : filtered.length === 0 ? (
-          <p className="text-center text-gray-500">No reminders yet. Create one to get started.</p>
+          <div className="flex flex-col items-center py-16 text-center text-gray-400">
+            <Bell className="w-10 h-10 mb-3 text-gray-300" />
+            <p>No reminders yet. Create one to get started.</p>
+          </div>
         ) : (
           <div className="space-y-4">
             {filtered.map((reminder) =>
@@ -404,8 +584,8 @@ function RemindersDashboard() {
                   key={reminder.id}
                   initialValues={{
                     company: reminder.company,
-                    person_name: reminder.person_name,
-                    person_email: reminder.person_email,
+                    person_names: (reminder.person_names || []).join(', '),
+                    person_emails: (reminder.person_emails || []).join(', '),
                     title: reminder.title,
                     notes: reminder.notes || '',
                     due_at: toDatetimeLocal(reminder.due_at),
