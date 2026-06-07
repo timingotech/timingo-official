@@ -49,7 +49,10 @@ async function fetchJson(url, options = {}) {
   return response.json();
 }
 
-const SOURCE_NAMES = ['RemoteOK', 'Arbeitnow', 'Adzuna', 'Remotive', 'Jobicy', 'The Muse', 'Himalayas'];
+const SOURCE_NAMES = [
+  'RemoteOK', 'Arbeitnow', 'Adzuna', 'Remotive', 'Jobicy', 'The Muse', 'Himalayas',
+  'Working Nomads', 'WeWorkRemotely',
+];
 
 const POSTED_WITHIN_HOURS = {
   '24h': 24,
@@ -72,6 +75,42 @@ function matchesAnyTerm(haystack, terms) {
   if (!terms.length) return true;
   const text = normalize(haystack);
   return terms.some((term) => text.includes(term));
+}
+
+function decodeXmlEntities(value) {
+  return String(value || '')
+    .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/&amp;/g, '&')
+    .trim();
+}
+
+function extractTag(xml, tag) {
+  const match = xml.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`));
+  return match ? decodeXmlEntities(match[1]) : '';
+}
+
+// Minimal hand-rolled RSS reader — these feeds are simple, flat <item> lists,
+// so a regex pass avoids pulling in an XML parsing dependency (and the bundling
+// risk that comes with it, per the axios lesson at the top of this file).
+function parseRssItems(xml) {
+  const items = xml.match(/<item>[\s\S]*?<\/item>/g) || [];
+  return items.map((item) => ({
+    title: extractTag(item, 'title'),
+    link: extractTag(item, 'link'),
+    pubDate: extractTag(item, 'pubDate'),
+    description: extractTag(item, 'description'),
+    region: extractTag(item, 'region'),
+    category: extractTag(item, 'category'),
+    type: extractTag(item, 'type'),
+  }));
+}
+
+function stripHtml(html) {
+  return String(html || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
 // First entry is RemoteOK's legal/metadata notice, not a job — drop it.
@@ -223,6 +262,53 @@ async function fetchHimalayas() {
   }));
 }
 
+async function fetchWorkingNomads() {
+  const data = await fetchJson('https://www.workingnomads.com/api/exposed_jobs/');
+  const jobs = Array.isArray(data) ? data : [];
+  return jobs.map((job) => ({
+    id: `workingnomads-${job.url || job.title}`,
+    title: job.title || 'Untitled role',
+    company: job.company_name || 'Unknown company',
+    location: job.location || 'Remote',
+    remote: true,
+    jobType: null,
+    tags: typeof job.tags === 'string' ? job.tags.split(',').map((t) => t.trim()).filter(Boolean) : [],
+    description: stripHtml(job.description),
+    postedAt: job.pub_date ? new Date(job.pub_date) : null,
+    url: job.url || null,
+    source: 'Working Nomads',
+  }));
+}
+
+// WeWorkRemotely has no JSON API — only RSS — so this is parsed with parseRssItems().
+// Listing titles are formatted "Company: Role", which we split on the first colon.
+async function fetchWeWorkRemotely() {
+  const response = await fetch('https://weworkremotely.com/remote-jobs.rss', {
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+  });
+  if (!response.ok) throw new Error(`WeWorkRemotely responded with ${response.status}`);
+  const items = parseRssItems(await response.text());
+
+  return items.map((item) => {
+    const sep = item.title.indexOf(':');
+    const company = sep > -1 ? item.title.slice(0, sep).trim() : 'Unknown company';
+    const title = sep > -1 ? item.title.slice(sep + 1).trim() : item.title;
+    return {
+      id: `wwr-${item.link || title}`,
+      title: title || 'Untitled role',
+      company,
+      location: item.region || 'Remote',
+      remote: true,
+      jobType: item.type || null,
+      tags: item.category ? [item.category] : [],
+      description: stripHtml(item.description),
+      postedAt: item.pubDate ? new Date(item.pubDate) : null,
+      url: item.link || null,
+      source: 'WeWorkRemotely',
+    };
+  });
+}
+
 // Pulls live openings straight from named employers' own public job-board APIs —
 // Greenhouse, Lever and Ashby all expose free, no-key JSON endpoints per company.
 // This is what gets us real listings from ~50 specific, recognizable companies
@@ -281,10 +367,6 @@ const COMPANIES = [
   { name: 'Outreach', platform: 'lever', token: 'outreach' },
   { name: 'Tala', platform: 'lever', token: 'tala' },
 ];
-
-function stripHtml(html) {
-  return String(html || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-}
 
 async function fetchGreenhouseCompany({ name, token }) {
   const data = await fetchJson(`https://boards-api.greenhouse.io/v1/boards/${token}/jobs?content=true`);
@@ -389,6 +471,8 @@ export default async function handler(req, res) {
       fetchJobicy(),
       fetchTheMuse(),
       fetchHimalayas(),
+      fetchWorkingNomads(),
+      fetchWeWorkRemotely(),
       ...COMPANIES.map(fetchCompanyJobs),
     ], GLOBAL_BUDGET_MS);
 
