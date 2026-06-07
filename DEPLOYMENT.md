@@ -94,6 +94,54 @@ Frontend will proxy API calls to backend via `"proxy": "http://localhost:5000"`
 
 ---
 
+## 🔔 Internal Reminders Page (`/reminders`)
+
+A simple internal tool for creating reminders tied to a person/company, with
+automatic email nudges sent ahead of the due date (e.g. 1 day before, 1 hour
+before, 10 minutes before, etc).
+
+It's gated by a basic login screen — **not real authentication**, just a
+soft barrier so it isn't open to the public. Both the login and password are
+the company name: `Timingo Tech` (case-insensitive). Don't put sensitive data
+behind it.
+
+### 1. Create the database (Supabase, free tier)
+1. Sign up at [supabase.com](https://supabase.com) and create a new project.
+2. Open **SQL Editor → New query**, paste the contents of [`supabase/schema.sql`](../supabase/schema.sql), and run it. This creates the `reminders` table.
+3. Go to **Project Settings → API** and copy:
+   - **Project URL** → `SUPABASE_URL`
+   - **`service_role` secret key** → `SUPABASE_SERVICE_KEY` (keep this secret — it bypasses row-level security, which is fine here since only your serverless functions use it)
+
+### 2. Add environment variables to Vercel
+In your Vercel project settings → Environment Variables, add:
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_KEY`
+- `CRON_SECRET` — any random string. Generate one locally with:
+  ```bash
+  node -e "console.log(require('crypto').randomBytes(24).toString('hex'))"
+  ```
+  This protects `/api/reminders-check` so random visitors can't trigger emails.
+
+Make sure `RESEND_API_KEY`, `FROM_NAME`, and `FROM_EMAIL` are also set (used for the contact/demo/subscribe flows already, and reused here for reminder emails).
+
+Redeploy after adding the variables.
+
+### 3. Schedule the reminder checker
+`/api/reminders-check` looks for due reminders and sends emails, but it only
+runs when something pings it — it doesn't run on its own. Use a free external
+cron service so it gets checked every few minutes regardless of your Vercel plan:
+
+1. Sign up at [cron-job.org](https://cron-job.org) (free).
+2. Create a new cron job:
+   - **URL:** `https://www.timingotech.com/api/reminders-check?token=YOUR_CRON_SECRET`
+   - **Schedule:** every 5 minutes (this gives roughly 5-minute precision on "X minutes before" reminders)
+3. Save and enable it.
+
+That's it — reminders created on `/reminders` will now email the attached
+person automatically as their due time approaches.
+
+---
+
 ## 📧 Email Flows
 
 ### Contact Form:
