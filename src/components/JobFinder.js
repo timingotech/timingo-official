@@ -521,8 +521,8 @@ function JobFinder() {
         <div className="mt-4 flex items-start gap-2 text-xs text-gray-500">
           <SlidersHorizontal className="mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
           <p>
-            Results are pulled live from RemoteOK, Arbeitnow, Remotive, Jobicy, The Muse, Himalayas, Adzuna, Working
-            Nomads, WeWorkRemotely, and the public job boards of 50+ named companies — including Airbnb, Stripe,
+            Results are pulled live from RemoteOK, Arbeitnow, Remotive, Jobicy, The Muse, Himalayas, Adzuna, Jooble,
+            Working Nomads, WeWorkRemotely, and the public job boards of 50+ named companies — including Airbnb, Stripe,
             OpenAI, Anthropic, Figma, Notion, Cloudflare, Databricks, and Duolingo — real job-board feeds, not a crawl
             of the entire web. Hybrid/on-site detection is best-effort, since most free feeds focus on remote roles.
           </p>

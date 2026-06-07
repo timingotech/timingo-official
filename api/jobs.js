@@ -50,7 +50,7 @@ async function fetchJson(url, options = {}) {
 }
 
 const SOURCE_NAMES = [
-  'RemoteOK', 'Arbeitnow', 'Adzuna', 'Remotive', 'Jobicy', 'The Muse', 'Himalayas',
+  'RemoteOK', 'Arbeitnow', 'Adzuna', 'Jooble', 'Remotive', 'Jobicy', 'The Muse', 'Himalayas',
   'Working Nomads', 'WeWorkRemotely',
 ];
 
@@ -110,7 +110,16 @@ function parseRssItems(xml) {
 }
 
 function stripHtml(html) {
-  return String(html || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  return String(html || '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/&amp;/g, '&')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 // First entry is RemoteOK's legal/metadata notice, not a job — drop it.
@@ -182,6 +191,33 @@ async function fetchAdzuna({ what, location }) {
     postedAt: job.created ? new Date(job.created) : null,
     url: job.redirect_url,
     source: 'Adzuna',
+  }));
+}
+
+// Optional — only runs if JOOBLE_API_KEY is configured (free signup, 500 req/mo, at jooble.org/api/about).
+async function fetchJooble({ what, location }) {
+  const apiKey = process.env.JOOBLE_API_KEY;
+  if (!apiKey) return [];
+
+  const data = await fetchJson(`https://jooble.org/api/${apiKey}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ keywords: what || '', location: location || '' }),
+  });
+
+  const jobs = Array.isArray(data?.jobs) ? data.jobs : [];
+  return jobs.map((job) => ({
+    id: `jooble-${job.id}`,
+    title: job.title || 'Untitled role',
+    company: job.company || 'Unknown company',
+    location: job.location || '',
+    remote: /remote/i.test(`${job.title} ${job.location || ''}`),
+    jobType: job.type || null,
+    tags: [],
+    description: stripHtml(job.snippet),
+    postedAt: job.updated ? new Date(job.updated) : null,
+    url: job.link || null,
+    source: 'Jooble',
   }));
 }
 
@@ -467,6 +503,7 @@ export default async function handler(req, res) {
       fetchRemoteOK(),
       fetchArbeitnow(),
       fetchAdzuna({ what: [keywords, industryTerms].filter(Boolean).join(' '), location }),
+      fetchJooble({ what: [keywords, industryTerms].filter(Boolean).join(' '), location }),
       fetchRemotive(),
       fetchJobicy(),
       fetchTheMuse(),
