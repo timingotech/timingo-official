@@ -1,4 +1,16 @@
-import axios from 'axios';
+// Deliberately uses the runtime's built-in fetch instead of axios — Vercel's bundler
+// (@vercel/nft) fails to trace axios's platform-specific internals into the function
+// bundle, which crashes the function at boot with FUNCTION_INVOCATION_FAILED
+// ("Cannot find module '/var/task/node_modules/axios/dist/node/axios.cjs'").
+// Native fetch needs no bundling at all, so this sidesteps the problem entirely.
+
+const FETCH_TIMEOUT_MS = 6000;
+
+async function fetchJson(url, options = {}) {
+  const response = await fetch(url, { ...options, signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
+  if (!response.ok) throw new Error(`${url} responded with ${response.status}`);
+  return response.json();
+}
 
 const SOURCE_NAMES = ['RemoteOK', 'Arbeitnow', 'Adzuna'];
 
@@ -27,13 +39,8 @@ function matchesAnyTerm(haystack, terms) {
 
 // First entry is RemoteOK's legal/metadata notice, not a job — drop it.
 async function fetchRemoteOK() {
-  const { data } = await axios.get('https://remoteok.com/api', {
+  const data = await fetchJson('https://remoteok.com/api', {
     headers: { 'User-Agent': 'TimingoTech-JobFinder/1.0 (+https://timingotech.com)' },
-    // Kept short: sources run in parallel via Promise.allSettled, and the slowest one
-    // sets the function's total runtime — a single stalled request (e.g. RemoteOK's
-    // bot-protection stalling cloud/datacenter IPs) can otherwise push the whole
-    // invocation past Vercel's ~10s execution limit and crash it outright.
-    timeout: 6000,
   });
   const jobs = Array.isArray(data) ? data.slice(1) : [];
   return jobs.map((job) => ({
@@ -52,7 +59,7 @@ async function fetchRemoteOK() {
 }
 
 async function fetchArbeitnow() {
-  const { data } = await axios.get('https://www.arbeitnow.com/api/job-board-api', { timeout: 6000 });
+  const data = await fetchJson('https://www.arbeitnow.com/api/job-board-api');
   const jobs = Array.isArray(data?.data) ? data.data : [];
   return jobs.map((job) => ({
     id: `arbeitnow-${job.slug}`,
@@ -76,17 +83,15 @@ async function fetchAdzuna({ what, location }) {
   if (!appId || !appKey) return [];
 
   const country = process.env.ADZUNA_COUNTRY || 'us';
-  const { data } = await axios.get(`https://api.adzuna.com/v1/api/jobs/${country}/search/1`, {
-    timeout: 6000,
-    params: {
-      app_id: appId,
-      app_key: appKey,
-      results_per_page: 50,
-      max_days_old: 7,
-      ...(what ? { what } : {}),
-      ...(location ? { where: location } : {}),
-    },
+  const params = new URLSearchParams({
+    app_id: appId,
+    app_key: appKey,
+    results_per_page: '50',
+    max_days_old: '7',
+    ...(what ? { what } : {}),
+    ...(location ? { where: location } : {}),
   });
+  const data = await fetchJson(`https://api.adzuna.com/v1/api/jobs/${country}/search/1?${params}`);
 
   const jobs = Array.isArray(data?.results) ? data.results : [];
   return jobs.map((job) => ({
