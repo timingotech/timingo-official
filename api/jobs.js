@@ -50,8 +50,8 @@ async function fetchJson(url, options = {}) {
 }
 
 const SOURCE_NAMES = [
-  'RemoteOK', 'Arbeitnow', 'Adzuna', 'Jooble', 'Remotive', 'Jobicy', 'The Muse', 'Himalayas',
-  'Working Nomads', 'WeWorkRemotely',
+  'RemoteOK', 'Arbeitnow', 'Adzuna', 'Jooble', 'TheirStack', 'Remotive', 'Jobicy', 'The Muse',
+  'Himalayas', 'Working Nomads', 'WeWorkRemotely',
 ];
 
 const POSTED_WITHIN_HOURS = {
@@ -218,6 +218,53 @@ async function fetchJooble({ what, location }) {
     postedAt: job.updated ? new Date(job.updated) : null,
     url: job.link || null,
     source: 'Jooble',
+  }));
+}
+
+// Optional — only runs if THEIRSTACK_API_KEY is configured (theirstack.com).
+// IMPORTANT: TheirStack bills 1 API credit per job RETURNED (not per request),
+// so `limit` is kept deliberately small here to control cost. The API also
+// requires at least one date or company filter on every request, which
+// `posted_at_max_age_days` satisfies.
+async function fetchTheirStack({ what, location, postedWithin }) {
+  const apiKey = process.env.THEIRSTACK_API_KEY;
+  if (!apiKey) return [];
+
+  const days = POSTED_WITHIN_HOURS[postedWithin]
+    ? Math.max(1, Math.ceil(POSTED_WITHIN_HOURS[postedWithin] / 24))
+    : 14;
+
+  const body = {
+    posted_at_max_age_days: days,
+    limit: 15,
+    page: 0,
+    order_by: [{ field: 'date_posted', desc: true }],
+    ...(what ? { job_title_or: [what] } : {}),
+    ...(location ? { job_location_pattern_or: [location] } : {}),
+  };
+
+  const data = await fetchJson('https://api.theirstack.com/v1/jobs/search', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify(body),
+  });
+
+  const jobs = Array.isArray(data?.data) ? data.data : [];
+  return jobs.map((job) => ({
+    id: `theirstack-${job.id}`,
+    title: job.job_title || 'Untitled role',
+    company: job.company || job.company_object?.name || 'Unknown company',
+    location: String(job.short_location || job.location || '').replace(/\{\{.*?\}\}/g, '').trim(),
+    remote: Boolean(job.remote),
+    jobType: Array.isArray(job.employment_statuses) ? job.employment_statuses[0] : null,
+    tags: Array.isArray(job.technology_slugs) ? job.technology_slugs.slice(0, 6) : [],
+    description: stripHtml(job.description),
+    postedAt: job.date_posted ? new Date(job.date_posted) : null,
+    url: job.final_url || job.url || job.source_url || null,
+    source: 'TheirStack',
   }));
 }
 
@@ -504,6 +551,7 @@ export default async function handler(req, res) {
       fetchArbeitnow(),
       fetchAdzuna({ what: [keywords, industryTerms].filter(Boolean).join(' '), location }),
       fetchJooble({ what: [keywords, industryTerms].filter(Boolean).join(' '), location }),
+      fetchTheirStack({ what: [keywords, industryTerms].filter(Boolean).join(' '), location, postedWithin }),
       fetchRemotive(),
       fetchJobicy(),
       fetchTheMuse(),
