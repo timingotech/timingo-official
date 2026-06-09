@@ -19,7 +19,7 @@ function buildEmailHtml({ reminder, name, dueLabel, isCreated = false, offsetMin
     ? `<p style="margin:0 0 16px;color:#374151;line-height:1.6;">${String(reminder.custom_email_body).replace(/\n/g, '<br/>')}</p>`
     : isCreated
     ? `<p style="margin:0 0 16px;color:#374151;line-height:1.6;">A reminder has been set for <strong style="color:#111827;">${reminder.company}</strong>. You'll receive follow-up nudges by email as the due time approaches.</p>`
-    : `<p style="margin:0 0 16px;color:#374151;line-height:1.6;">This is your reminder for <strong style="color:#111827;">${reminder.company}</strong>${offsetMinutes === 0 ? ' — it's due <strong>right now</strong>' : `, due <strong>${when}</strong>`}.</p>`;
+    : `<p style="margin:0 0 16px;color:#374151;line-height:1.6;">This is your reminder for <strong style="color:#111827;">${reminder.company}</strong>${offsetMinutes === 0 ? ' — due <strong>right now</strong>' : `, due <strong>${when}</strong>`}.</p>`;
 
   const notesHtml = reminder.notes
     ? `<div style="margin:16px 0;padding:14px 16px;background:#F9FAFB;border-left:3px solid #D1D5DB;border-radius:4px;">
