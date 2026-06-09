@@ -125,6 +125,13 @@ async function sendReminderEmail(resend, reminder, offsetMinutes) {
   await Promise.all(
     emails.map(async (email, i) => {
       const name = names[i] || email;
+
+      const bodyHtml = reminder.custom_email_body
+        ? `<p>${String(reminder.custom_email_body).replace(/\n/g, '<br/>')}</p>`
+        : `<p>This is a reminder for <strong>${reminder.company}</strong>${offsetMinutes === 0 ? ', due right now' : `, due ${when}`}:</p>
+           <h3 style="margin: 8px 0;">${reminder.title}</h3>
+           ${reminder.notes ? `<p>${reminder.notes}</p>` : ''}`;
+
       try {
         await resend.emails.send({
           from: `${process.env.FROM_NAME || 'TimingoTech Reminders'} <${process.env.FROM_EMAIL}>`,
@@ -133,12 +140,9 @@ async function sendReminderEmail(resend, reminder, offsetMinutes) {
             ? `Due now: ${reminder.title}`
             : `Reminder (${when}): ${reminder.title}`,
           html: `<p>Hi ${name},</p>
-            <p>This is a reminder for <strong>${reminder.company}</strong>${offsetMinutes === 0 ? ', due right now' : `, due ${when}`}:</p>
-            <h3 style="margin: 8px 0;">${reminder.title}</h3>
-            ${reminder.notes ? `<p>${reminder.notes}</p>` : ''}
+            ${bodyHtml}
             <p><strong>Due:</strong> ${dueLabel}</p>
-            <p style="color:#888; font-size: 12px;">Sent by Timingo Tech Reminders</p>
-          `,
+            <p style="color:#888; font-size: 12px;">Sent by Timingo Tech Reminders</p>`,
         });
       } catch (err) {
         console.error(`Failed to send reminder email to ${email} for ${reminder.id} (offset ${offsetMinutes}):`, err);

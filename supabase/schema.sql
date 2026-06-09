@@ -3,6 +3,7 @@
 --
 -- NOTE: this drops any existing `reminders` table — fine for a fresh setup,
 -- but don't re-run it once you have real reminders you want to keep.
+-- For existing installs, run supabase/migrations/001_add_priority_category_url.sql instead.
 
 drop table if exists reminders;
 
@@ -17,6 +18,10 @@ create table reminders (
   remind_offsets_minutes int[] not null default '{1440,60,10,5}',
   sent_offsets int[] not null default '{}',
   completed boolean not null default false,
+  priority text not null default 'medium',
+  category text,
+  url text,
+  custom_email_body text,
   created_at timestamptz not null default now()
 );
 

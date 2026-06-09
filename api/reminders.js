@@ -5,13 +5,43 @@ function getClient() {
   return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 }
 
-// Sent immediately when a reminder is created — separate from (and in addition to)
-// the scheduled "X before due" nudges that api/reminders-check.js sends later.
+function buildEmailHtml({ reminder, name, dueLabel, isCreated = false, offsetMinutes = null }) {
+  const when = offsetMinutes === null ? null : describeOffset(offsetMinutes);
+  const bodyHtml = reminder.custom_email_body
+    ? `<p>${String(reminder.custom_email_body).replace(/\n/g, '<br/>')}</p>`
+    : `<p>${
+        isCreated
+          ? `A reminder has just been set for <strong>${reminder.company}</strong>:`
+          : `This is a reminder for <strong>${reminder.company}</strong>${offsetMinutes === 0 ? ', due right now' : `, due ${when}`}:`
+      }</p>
+      <h3 style="margin: 8px 0;">${reminder.title}</h3>
+      ${reminder.notes ? `<p>${reminder.notes}</p>` : ''}`;
+
+  return `<p>Hi ${name},</p>
+    ${bodyHtml}
+    <p><strong>Due:</strong> ${dueLabel}</p>
+    ${isCreated ? "<p>You'll get follow-up nudges by email as the due time gets closer.</p>" : ''}
+    <p style="color:#888; font-size: 12px;">Sent by Timingo Tech Reminders</p>`;
+}
+
+function describeOffset(offsetMinutes) {
+  if (offsetMinutes === 0) return 'right now';
+  if (offsetMinutes % 1440 === 0) {
+    const days = offsetMinutes / 1440;
+    return `in ${days} day${days > 1 ? 's' : ''}`;
+  }
+  if (offsetMinutes % 60 === 0) {
+    const hours = offsetMinutes / 60;
+    return `in ${hours} hour${hours > 1 ? 's' : ''}`;
+  }
+  return `in ${offsetMinutes} minutes`;
+}
+
+// Sent immediately when a reminder is created.
 async function sendCreatedEmail(reminder) {
   if (!process.env.RESEND_API_KEY) return;
 
   const resend = new Resend(process.env.RESEND_API_KEY);
-  // Note: `dateStyle`/`timeStyle` can't be combined with `timeZoneName` (Intl throws), so spell out the parts.
   const dueLabel = new Date(reminder.due_at).toLocaleString('en-US', {
     year: 'numeric',
     month: 'short',
@@ -32,14 +62,7 @@ async function sendCreatedEmail(reminder) {
           from: `${process.env.FROM_NAME || 'TimingoTech Reminders'} <${process.env.FROM_EMAIL}>`,
           to: email,
           subject: `Reminder set: ${reminder.title}`,
-          html: `<p>Hi ${name},</p>
-            <p>A reminder has just been set for <strong>${reminder.company}</strong>:</p>
-            <h3 style="margin: 8px 0;">${reminder.title}</h3>
-            ${reminder.notes ? `<p>${reminder.notes}</p>` : ''}
-            <p><strong>Due:</strong> ${dueLabel}</p>
-            <p>You'll get follow-up nudges by email as the due time gets closer.</p>
-            <p style="color:#888; font-size: 12px;">Sent by Timingo Tech Reminders</p>
-          `,
+          html: buildEmailHtml({ reminder, name, dueLabel, isCreated: true }),
         });
       } catch (err) {
         console.error(`Failed to send "reminder created" email to ${email} for ${reminder.id}:`, err);
@@ -57,6 +80,10 @@ const UPDATABLE_FIELDS = [
   'due_at',
   'remind_offsets_minutes',
   'completed',
+  'priority',
+  'category',
+  'url',
+  'custom_email_body',
 ];
 
 export default async function handler(req, res) {
@@ -86,7 +113,10 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'POST') {
-      const { company, person_names, person_emails, title, notes, due_at, remind_offsets_minutes } = req.body || {};
+      const {
+        company, person_names, person_emails, title, notes, due_at,
+        remind_offsets_minutes, priority, category, url, custom_email_body,
+      } = req.body || {};
 
       const emails = Array.isArray(person_emails) ? person_emails.map((e) => String(e).trim()).filter(Boolean) : [];
       const names = Array.isArray(person_names) ? person_names.map((n) => String(n).trim()).filter(Boolean) : [];
@@ -109,14 +139,16 @@ export default async function handler(req, res) {
           notes: notes || null,
           due_at,
           remind_offsets_minutes: offsets,
+          priority: priority || 'medium',
+          category: category || null,
+          url: url || null,
+          custom_email_body: custom_email_body || null,
         })
         .select()
         .single();
 
       if (error) throw error;
 
-      // Fire-and-forget: let the person know right away that a reminder was set for them.
-      // Don't let an email hiccup block the API response — the reminder is already saved.
       sendCreatedEmail(data).catch((err) => console.error('sendCreatedEmail failed:', err));
 
       return res.status(201).json({ reminder: data });
@@ -148,7 +180,7 @@ export default async function handler(req, res) {
           : [];
       }
 
-      // Changing the due date means past notifications no longer apply — let them fire again on the new schedule
+      // Changing the due date means past notifications no longer apply — reset so they fire on the new schedule.
       if ('due_at' in patch) patch.sent_offsets = [];
 
       const { data, error } = await supabase.from('reminders').update(patch).eq('id', id).select().single();
