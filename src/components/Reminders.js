@@ -147,10 +147,9 @@ async function unsubscribeFromPush() {
 }
 
 function buildPreviewHtml(form) {
-  const emails = parseList(form.person_emails);
-  const names = parseList(form.person_names);
-  const email = emails[0] || 'recipient@example.com';
-  const name = names[0] || email;
+  const emails   = parseList(form.person_emails);
+  const names    = parseList(form.person_names);
+  const name     = names[0] || emails[0] || 'Recipient';
   const dueLabel = form.due_at
     ? new Date(form.due_at).toLocaleString('en-US', {
         year: 'numeric', month: 'short', day: 'numeric',
@@ -158,19 +157,73 @@ function buildPreviewHtml(form) {
       })
     : '(date not set)';
 
-  const bodyHtml = form.custom_email_body
-    ? `<p>${String(form.custom_email_body).replace(/\n/g, '<br/>')}</p>`
-    : `<p>A reminder has just been set for <strong>${form.company || '(company)'}</strong>:</p>
-       <h3 style="margin:8px 0;">${form.title || '(title)'}</h3>
-       ${form.notes ? `<p>${form.notes}</p>` : ''}`;
+  const company  = form.company  || '(company)';
+  const title    = form.title    || '(title)';
+  const category = form.category || '';
+  const url      = form.url      || '';
 
-  return `<div style="font-family:sans-serif;max-width:480px;color:#333;">
-    <p>Hi ${name},</p>
-    ${bodyHtml}
-    <p><strong>Due:</strong> ${dueLabel}</p>
-    <p>You'll get follow-up nudges by email as the due time gets closer.</p>
-    <p style="color:#888;font-size:12px;">Sent by Timingo Tech Reminders</p>
-  </div>`;
+  const messageHtml = form.custom_email_body
+    ? `<p style="margin:0 0 16px;color:#374151;line-height:1.6;">${String(form.custom_email_body).replace(/\n/g, '<br/>')}</p>`
+    : `<p style="margin:0 0 16px;color:#374151;line-height:1.6;">A reminder has been set for <strong style="color:#111827;">${company}</strong>. You'll receive follow-up nudges by email as the due time approaches.</p>`;
+
+  const notesHtml = form.notes
+    ? `<div style="margin:16px 0;padding:14px 16px;background:#F9FAFB;border-left:3px solid #D1D5DB;border-radius:4px;">
+        <p style="margin:0;font-size:13px;color:#6B7280;line-height:1.6;">${form.notes.replace(/\n/g, '<br/>')}</p>
+       </div>`
+    : '';
+
+  const urlHtml = url
+    ? `<p style="margin:12px 0 0;"><a href="${url}" style="color:#6675F7;font-size:13px;text-decoration:none;">🔗 View reference link →</a></p>`
+    : '';
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#F3F4F6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#F3F4F6;padding:16px;">
+    <tr><td align="center">
+      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;">
+        <tr><td style="background:linear-gradient(135deg,#F7666F,#6675F7);border-radius:12px 12px 0 0;padding:20px 28px;">
+          <p style="margin:0;font-size:12px;font-weight:600;letter-spacing:0.05em;color:rgba(255,255,255,0.8);text-transform:uppercase;">Timingo Tech Reminders</p>
+          <p style="margin:5px 0 0;font-size:20px;font-weight:700;color:#ffffff;">${title}</p>
+        </td></tr>
+        <tr><td style="background:#ffffff;padding:24px 28px;border-left:1px solid #E5E7EB;border-right:1px solid #E5E7EB;">
+          <p style="margin:0 0 18px;">
+            <span style="display:inline-block;padding:5px 13px;background:#6675F718;color:#6675F7;font-size:12px;font-weight:600;border-radius:20px;border:1px solid #6675F733;">🔔 Reminder Set</span>
+          </p>
+          <p style="margin:0 0 4px;font-size:15px;color:#111827;">Hi <strong>${name}</strong>,</p>
+          <div style="margin:14px 0;">${messageHtml}${notesHtml}</div>
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin:18px 0;">
+            <tr><td style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;padding:12px 16px;">
+              <p style="margin:0 0 2px;font-size:11px;font-weight:600;letter-spacing:0.06em;color:#9CA3AF;text-transform:uppercase;">Due date &amp; time</p>
+              <p style="margin:0;font-size:15px;font-weight:600;color:#111827;">${dueLabel}</p>
+            </td></tr>
+          </table>
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td width="50%" style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;padding:11px 14px;">
+                <p style="margin:0 0 2px;font-size:11px;font-weight:600;letter-spacing:0.06em;color:#9CA3AF;text-transform:uppercase;">Company</p>
+                <p style="margin:0;font-size:13px;font-weight:600;color:#111827;">${company}</p>
+              </td>
+              ${category ? `<td width="4px"></td>
+              <td style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;padding:11px 14px;">
+                <p style="margin:0 0 2px;font-size:11px;font-weight:600;letter-spacing:0.06em;color:#9CA3AF;text-transform:uppercase;">Category</p>
+                <p style="margin:0;font-size:13px;font-weight:600;color:#111827;">${category}</p>
+              </td>` : ''}
+            </tr>
+          </table>
+          ${urlHtml}
+        </td></tr>
+        <tr><td style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:0 0 12px 12px;border-top:none;padding:14px 28px;">
+          <p style="margin:0;font-size:12px;color:#9CA3AF;text-align:center;">
+            Sent by <strong style="color:#6B7280;">Timingo Tech Reminders</strong> &nbsp;·&nbsp; <a href="https://timingotech.com/reminders" style="color:#6675F7;text-decoration:none;">Manage reminders</a>
+          </p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
 }
 
 function exportCSV(reminders) {
