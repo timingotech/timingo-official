@@ -1,9 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 
 const NotFound = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-blue-50">
+      <Helmet>
+        <title>Page Not Found | TimingoTech</title>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       <div className="text-center p-8">
         <h1 className="text-6xl font-black text-gray-900 mb-4">404</h1>
         <p className="text-xl text-gray-600 mb-6">Page not found — the link may be broken or the page removed.</p>

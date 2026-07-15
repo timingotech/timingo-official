@@ -1,7 +1,7 @@
 import { Resend } from 'resend';
+import { escapeHtml, getMailConfig } from './_security.js';
 
 export default async function handler(req, res) {
-  // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -10,85 +10,72 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  // Only allow POST
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  console.log('Demo API called with body:', req.body);
+  if (!process.env.RESEND_API_KEY) {
+    return res.status(500).json({ error: 'Email service is not configured' });
+  }
 
-  const resend = new Resend('re_gbdZsVDi_LR6jmfCi3QBTXqWwbqrJi7kg');
-
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const { fromName, fromEmail, adminEmail } = getMailConfig();
   const { name, email, phone, industry } = req.body || {};
 
   if (!name || !email) {
-    console.log('Missing required fields');
     return res.status(400).json({ error: 'Missing required fields: name, email' });
   }
 
-  console.log('Attempting to send emails for:', { name, email, phone, industry });
+  const safe = {
+    name: escapeHtml(name),
+    email: escapeHtml(email),
+    phone: escapeHtml(phone || 'Not provided'),
+    industry: escapeHtml(industry || 'Not specified'),
+  };
 
   try {
-    // Send to admin
-    const adminEmail = await resend.emails.send({
-      from: 'TimingoFlow <team@timingotech.com>',
-      to: 'team@timingotech.com',
-      subject: `🚀 New TimingoFlow Demo Request from ${name}`,
+    const adminResult = await resend.emails.send({
+      from: `TimingoFlow <${fromEmail}>`,
+      to: adminEmail,
+      subject: `New TimingoFlow demo request from ${safe.name}`,
       html: `<h3>New TimingoFlow Demo Booking</h3>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Phone:</strong> ${phone || 'Not provided'}</p>
-        <p><strong>Industry:</strong> ${industry || 'Not specified'}</p>
+        <p><strong>Name:</strong> ${safe.name}</p>
+        <p><strong>Email:</strong> ${safe.email}</p>
+        <p><strong>Phone:</strong> ${safe.phone}</p>
+        <p><strong>Industry:</strong> ${safe.industry}</p>
         <hr/>
-        <p><em>Follow up with this lead to schedule their 10-minute demo!</em></p>
+        <p><em>Follow up with this lead to schedule their 10-minute demo.</em></p>
       `,
     });
 
-    console.log('Admin email response:', JSON.stringify(adminEmail, null, 2));
-
-    if (adminEmail.error) {
-      console.error('Resend API error:', adminEmail.error);
-      return res.status(500).json({ 
-        error: 'Email service error', 
-        details: adminEmail.error,
-        debug: { name, email, phone, industry }
-      });
+    if (adminResult.error) {
+      console.error('Resend API error:', adminResult.error);
+      return res.status(500).json({ error: 'Email service error' });
     }
 
-    // Send confirmation to user
     try {
       const userEmail = await resend.emails.send({
-        from: 'TimingoFlow <team@timingotech.com>',
+        from: `TimingoFlow <${fromEmail}>`,
         to: email,
-        subject: 'Your TimingoFlow Demo Request',
-        html: `<p>Hi ${name},</p>
-          <p>Thanks for your interest in TimingoFlow! We've received your demo request and will get back to you within 24 hours to schedule your 10-minute demo.</p>
+        subject: 'Your TimingoFlow demo request',
+        html: `<p>Hi ${safe.name},</p>
+          <p>Thanks for your interest in TimingoFlow. We've received your demo request and will get back to you within 24 hours to schedule your 10-minute demo.</p>
           <p>In the meantime, feel free to reply to this email if you have any questions.</p>
-          <p>Best regards,<br/>TimingoTech Team</p>
+          <p>Best regards,<br/>${escapeHtml(fromName)} Team</p>
         `,
       });
-      console.log('User confirmation sent:', userEmail);
+      console.log('User confirmation sent:', userEmail?.id);
     } catch (replyErr) {
       console.error('Demo auto-reply error:', replyErr);
     }
 
-    console.log('Returning success response with emailId:', adminEmail.id);
-    return res.status(200).json({ 
-      ok: true, 
-      emailId: adminEmail.id,
+    return res.status(200).json({
+      ok: true,
+      emailId: adminResult.id,
       message: 'Demo request submitted successfully',
-      debug: {
-        adminEmailSent: !!adminEmail.id,
-        timestamp: new Date().toISOString()
-      }
     });
   } catch (err) {
     console.error('Demo email error:', err);
-    console.error('Error details:', JSON.stringify(err, null, 2));
-    return res.status(500).json({ 
-      error: 'Failed to send demo request', 
-      details: err.message || String(err),
-      stack: err.stack
-    });
+    return res.status(500).json({ error: 'Failed to send demo request' });
   }
 }

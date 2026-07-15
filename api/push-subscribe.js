@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { requireSharedSecret } from './_security.js';
 
 function getClient() {
   return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
@@ -8,10 +9,14 @@ function getClient() {
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Reminders-Auth, X-Internal-Auth');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
+  }
+
+  if (!requireSharedSecret(req, res)) {
+    return;
   }
 
   if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {

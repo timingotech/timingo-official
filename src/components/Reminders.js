@@ -11,8 +11,13 @@ import {
 
 // ─── constants ───────────────────────────────────────────────────────────────
 
-const COMPANY_NAME = 'Timingo Tech';
 const AUTH_KEY = 'timingo_reminders_auth';
+const AUTH_TOKEN_KEY = 'timingo_reminders_token';
+
+function remindersAuthHeaders() {
+  const token = localStorage.getItem(AUTH_TOKEN_KEY);
+  return token ? { 'X-Reminders-Auth': token } : {};
+}
 
 const OFFSET_PRESETS = [
   { label: '1 day before', minutes: 1440 },
@@ -133,7 +138,7 @@ async function subscribeToPush() {
       applicationServerKey: urlBase64ToUint8Array(publicKey),
     });
   }
-  await axios.post('/api/push-subscribe', { subscription });
+  await axios.post('/api/push-subscribe', { subscription }, { headers: remindersAuthHeaders() });
   return subscription;
 }
 
@@ -142,7 +147,10 @@ async function unsubscribeFromPush() {
   if (!registration) return;
   const subscription = await registration.pushManager.getSubscription();
   if (!subscription) return;
-  await axios.delete('/api/push-subscribe', { data: { subscription: { endpoint: subscription.endpoint } } });
+  await axios.delete('/api/push-subscribe', {
+    data: { subscription: { endpoint: subscription.endpoint } },
+    headers: remindersAuthHeaders(),
+  });
   await subscription.unsubscribe();
 }
 
@@ -184,7 +192,7 @@ function buildPreviewHtml(form) {
     <tr><td align="center">
       <table width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;">
         <tr><td style="background:linear-gradient(135deg,#F7666F,#6675F7);border-radius:12px 12px 0 0;padding:20px 28px;">
-          <p style="margin:0;font-size:12px;font-weight:600;letter-spacing:0.05em;color:rgba(255,255,255,0.8);text-transform:uppercase;">Timingo Tech Reminders</p>
+          <p style="margin:0;font-size:12px;font-weight:600;letter-spacing:0.05em;color:rgba(255,255,255,0.8);text-transform:uppercase;">TimingoTech Reminders</p>
           <p style="margin:5px 0 0;font-size:20px;font-weight:700;color:#ffffff;">${title}</p>
         </td></tr>
         <tr><td style="background:#ffffff;padding:24px 28px;border-left:1px solid #E5E7EB;border-right:1px solid #E5E7EB;">
@@ -216,7 +224,7 @@ function buildPreviewHtml(form) {
         </td></tr>
         <tr><td style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:0 0 12px 12px;border-top:none;padding:14px 28px;">
           <p style="margin:0;font-size:12px;color:#9CA3AF;text-align:center;">
-            Sent by <strong style="color:#6B7280;">Timingo Tech Reminders</strong> &nbsp;·&nbsp; <a href="https://timingotech.com/reminders" style="color:#6675F7;text-decoration:none;">Manage reminders</a>
+            Sent by <strong style="color:#6B7280;">TimingoTech Reminders</strong> &nbsp;·&nbsp; <a href="https://timingotech.com/reminders" style="color:#6675F7;text-decoration:none;">Manage reminders</a>
           </p>
         </td></tr>
       </table>
@@ -267,19 +275,19 @@ function GateForm({ onSuccess }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const matches = (v) => v.trim().toLowerCase() === COMPANY_NAME.toLowerCase();
-    if (matches(username) && matches(password)) {
+    if (username.trim() && password.trim()) {
       localStorage.setItem(AUTH_KEY, 'true');
+      localStorage.setItem(AUTH_TOKEN_KEY, password.trim());
       onSuccess();
     } else {
-      setError('Incorrect login or password.');
+      setError('Enter the internal access token.');
     }
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen px-4 py-10 bg-gradient-to-br from-gray-50 via-white to-blue-50">
       <Helmet>
-        <title>Reminders — Internal | Timingo Tech</title>
+        <title>Reminders — Internal | TimingoTech</title>
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
       <form onSubmit={handleSubmit} className="w-full max-w-sm p-8 bg-white border border-gray-100 shadow-xl rounded-2xl">
@@ -287,13 +295,13 @@ function GateForm({ onSuccess }) {
           <Bell className="w-6 h-6 text-white" />
         </div>
         <h1 className="mb-1 text-2xl font-bold text-center hometext-gradient">Internal Reminders</h1>
-        <p className="mb-6 text-sm text-center text-gray-500">Sign in to manage reminders</p>
+        <p className="mb-6 text-sm text-center text-gray-500">Enter the internal access token to manage reminders</p>
         <label className={labelClasses}>Login</label>
         <input type="text" value={username} onChange={(e) => setUsername(e.target.value)}
-          className={`${inputClasses} mb-4`} placeholder="Company name" autoComplete="username" />
+          className={`${inputClasses} mb-4`} placeholder="Your name" autoComplete="username" />
         <label className={labelClasses}>Password</label>
         <input type="password" value={password} onChange={(e) => setPassword(e.target.value)}
-          className={`${inputClasses} mb-4`} placeholder="Company name" autoComplete="current-password" />
+          className={`${inputClasses} mb-4`} placeholder="Access token" autoComplete="current-password" />
         {error && (
           <p className="flex items-center gap-1.5 mb-3 text-sm text-red-500">
             <AlertCircle className="w-4 h-4 shrink-0" /> {error}
@@ -792,7 +800,7 @@ function RemindersDashboard() {
   const load = useCallback(async () => {
     setLoading(true); setError('');
     try {
-      const { data } = await axios.get('/api/reminders');
+      const { data } = await axios.get('/api/reminders', { headers: remindersAuthHeaders() });
       setReminders(data.reminders || []);
     } catch (err) {
       setError(errorMessageFrom(err, 'Could not load reminders.'));
@@ -827,7 +835,7 @@ function RemindersDashboard() {
   const handleCreate = async (form) => {
     setBusy(true); setError('');
     try {
-      await axios.post('/api/reminders', buildPayload(form));
+      await axios.post('/api/reminders', buildPayload(form), { headers: remindersAuthHeaders() });
       setShowForm(false); setDuplicating(null);
       setNotice('Reminder created.'); await load();
     } catch (err) { setError(errorMessageFrom(err, 'Could not create reminder.')); }
@@ -838,7 +846,7 @@ function RemindersDashboard() {
   const handleUpdate = async (id, form) => {
     setBusy(true); setError('');
     try {
-      await axios.patch('/api/reminders', { id, ...buildPayload(form) });
+      await axios.patch('/api/reminders', { id, ...buildPayload(form) }, { headers: remindersAuthHeaders() });
       setEditingId(null); setNotice('Reminder updated.'); await load();
     } catch (err) { setError(errorMessageFrom(err, 'Could not update reminder.')); }
     finally { setBusy(false); }
@@ -848,7 +856,7 @@ function RemindersDashboard() {
   const toggleCompleted = async (reminder) => {
     setError('');
     try {
-      await axios.patch('/api/reminders', { id: reminder.id, completed: !reminder.completed });
+      await axios.patch('/api/reminders', { id: reminder.id, completed: !reminder.completed }, { headers: remindersAuthHeaders() });
       await load();
     } catch (err) { setError(errorMessageFrom(err, 'Could not update reminder.')); }
   };
@@ -858,7 +866,7 @@ function RemindersDashboard() {
     setError('');
     try {
       const newDue = new Date(Date.now() + minutes * 60 * 1000).toISOString();
-      await axios.patch('/api/reminders', { id: reminder.id, due_at: newDue });
+      await axios.patch('/api/reminders', { id: reminder.id, due_at: newDue }, { headers: remindersAuthHeaders() });
       setNotice(`Snoozed until ${formatDate(newDue)}.`); await load();
     } catch (err) { setError(errorMessageFrom(err, 'Could not snooze reminder.')); }
   };
@@ -868,7 +876,7 @@ function RemindersDashboard() {
     delete pendingDeletesRef.current[id];
     setHiddenIds((prev) => { const next = new Set(prev); next.delete(id); return next; });
     try {
-      await axios.delete(`/api/reminders?id=${id}`);
+      await axios.delete(`/api/reminders?id=${id}`, { headers: remindersAuthHeaders() });
       setReminders((prev) => prev.filter((r) => r.id !== id));
     } catch (err) {
       setError(errorMessageFrom(err, 'Could not delete reminder.'));
@@ -903,7 +911,7 @@ function RemindersDashboard() {
   const handleBulkComplete = async () => {
     setError('');
     try {
-      await Promise.all([...selectedIds].map((id) => axios.patch('/api/reminders', { id, completed: true })));
+      await Promise.all([...selectedIds].map((id) => axios.patch('/api/reminders', { id, completed: true }, { headers: remindersAuthHeaders() })));
       setSelectedIds(new Set()); setSelectMode(false);
       setNotice(`${selectedIds.size} reminder${selectedIds.size > 1 ? 's' : ''} marked complete.`);
       await load();
@@ -914,7 +922,7 @@ function RemindersDashboard() {
     if (!window.confirm(`Delete ${selectedIds.size} reminder${selectedIds.size > 1 ? 's' : ''}?`)) return;
     setError('');
     try {
-      await Promise.all([...selectedIds].map((id) => axios.delete(`/api/reminders?id=${id}`)));
+      await Promise.all([...selectedIds].map((id) => axios.delete(`/api/reminders?id=${id}`, { headers: remindersAuthHeaders() })));
       setSelectedIds(new Set()); setSelectMode(false);
       setReminders((prev) => prev.filter((r) => !selectedIds.has(r.id)));
       setNotice('Reminders deleted.');
@@ -922,7 +930,7 @@ function RemindersDashboard() {
   };
 
   // ── sign out ──
-  const signOut = () => { localStorage.removeItem(AUTH_KEY); window.location.reload(); };
+  const signOut = () => { localStorage.removeItem(AUTH_KEY); localStorage.removeItem(AUTH_TOKEN_KEY); window.location.reload(); };
 
   // ── derived list ──
   const displayed = useMemo(() => {
@@ -982,7 +990,7 @@ function RemindersDashboard() {
   return (
     <div className="min-h-screen px-4 py-10 bg-gradient-to-br from-gray-50 via-white to-blue-50">
       <Helmet>
-        <title>Reminders — Internal | Timingo Tech</title>
+        <title>Reminders — Internal | TimingoTech</title>
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
 
@@ -1278,7 +1286,7 @@ function RemindersDashboard() {
 // ─── export ───────────────────────────────────────────────────────────────────
 
 const Reminders = () => {
-  const [authed, setAuthed] = useState(() => localStorage.getItem(AUTH_KEY) === 'true');
+  const [authed, setAuthed] = useState(() => localStorage.getItem(AUTH_KEY) === 'true' && !!localStorage.getItem(AUTH_TOKEN_KEY));
   if (!authed) return <GateForm onSuccess={() => setAuthed(true)} />;
   return <RemindersDashboard />;
 };

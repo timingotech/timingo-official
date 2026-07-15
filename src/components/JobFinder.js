@@ -414,14 +414,18 @@ function JobFinder() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 px-4 py-10 pt-28">
       <Helmet>
-        <title>Job Finder | Timingo Tech</title>
+        <title>Job Finder | TimingoTech</title>
         <meta name="description" content="Search recent job postings by industry, skills, location, work setting and more." />
+        <link rel="canonical" href="https://www.timingotech.com/jobs" />
       </Helmet>
 
       <div className="mx-auto max-w-5xl">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl">Job Finder</h1>
           <p className="mt-2 text-gray-600">Search recent postings across multiple job boards, filtered the way you like.</p>
+          <p className="mt-2 text-sm text-gray-500">
+            Resume uploads are used only to suggest filters for this search and are sent to our AI provider for analysis when you choose to upload or paste one.
+          </p>
         </div>
 
         <ResumeUpload onApply={applyResumeFilters} />

@@ -54,10 +54,11 @@ const sendEmail = async (e) => {
     });
 
     setSubmitStatus('success');
+    form.current.reset();
+    setIsSubmitting(false);
 
-    // Wait 3 seconds then reload the page
     setTimeout(() => {
-      window.location.reload();
+      setSubmitStatus(null);
     }, 3000);
 
   } catch (error) {
@@ -75,9 +76,9 @@ const sendEmail = async (e) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
       <Helmet>
-        <title>Contact Us - Timingotech | Get In Touch</title>
-        <meta name="description" content="Contact Timingotech for AI solutions, web development, mobile apps, and technology consulting. Reach out to discuss your project and let's build something amazing together." />
-        <meta name="keywords" content="contact Timingotech, get in touch, technology consulting, project inquiry" />
+        <title>Contact Us - TimingoTech | Get In Touch</title>
+        <meta name="description" content="Contact TimingoTech for AI growth systems, custom software, web development, and technology consulting." />
+        <meta name="keywords" content="contact TimingoTech, get in touch, technology consulting, project inquiry" />
         <link rel="canonical" href="https://www.timingotech.com/contact" />
       </Helmet>
       <style jsx>{`
@@ -172,7 +173,7 @@ const sendEmail = async (e) => {
                 href="#office-info" 
                 className="px-6 py-3 border-2 border-blue-600 text-blue-600 rounded-lg font-semibold hover:bg-blue-600 hover:text-white transition-all duration-300"
               >
-                Visit Our Office
+                Work With Us
               </a>
             </div>
           </div>
@@ -200,10 +201,10 @@ const sendEmail = async (e) => {
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">Email Us</h3>
                     <p className="text-gray-600 mb-2">Get detailed responses to your inquiries</p>
                     <a 
-                      href="mailto:timingotech@gmail.com" 
+                      href="mailto:team@timingotech.com" 
                       className="text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-2"
                     >
-                      timingotech@gmail.com
+                      team@timingotech.com
                       <ExternalLink className="w-4 h-4" />
                     </a>
                   </div>
@@ -245,12 +246,11 @@ const sendEmail = async (e) => {
                   Visit Us
                 </h2>
                 <p className="mb-6 text-lg text-gray-700">
-                  Come and visit our office! We are conveniently located and would be delighted 
-                  to meet you in person for detailed project discussions.
+                  We work with clients remotely and can schedule focused discovery calls for detailed project discussions.
                 </p>
                 
                 <div className="mb-8">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-4">Timingotech Headquarters</h3>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-4">TimingoTech</h3>
                   <address className="not-italic text-gray-700 leading-relaxed">
                     <div className="flex items-start gap-3 mb-4">
                       <MapPin className="w-5 h-5 text-purple-600 mt-1 flex-shrink-0" />
@@ -265,8 +265,8 @@ const sendEmail = async (e) => {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="p-4 bg-gray-50 rounded-lg text-center">
                       <Clock className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-                      <div className="font-semibold text-gray-900">Office Hours</div>
-                      <div className="text-sm text-gray-600">Mon-Fri 9AM-6PM</div>
+                      <div className="font-semibold text-gray-900">Business Hours</div>
+                      <div className="text-sm text-gray-600">Mon-Sat 9AM-6PM</div>
                     </div>
                     <div className="p-4 bg-gray-50 rounded-lg text-center">
                       <Users className="w-6 h-6 text-green-600 mx-auto mb-2" />
@@ -429,7 +429,7 @@ const sendEmail = async (e) => {
                 
                 {submitStatus === 'success' && (
                   <p className="text-green-600 mt-4 fade-in font-semibold">
-                    Thank you! We'll get back to you soon. Page will reload automatically...
+                    Thank you! We'll get back to you soon.
                   </p>
                 )}
                 
@@ -452,7 +452,7 @@ const sendEmail = async (e) => {
       <section className="py-20 px-6 bg-gradient-to-r from-blue-900 to-purple-900">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16 animate-on-scroll">
-            <h2 className="text-4xl font-bold text-white mb-4">Why Choose Timingotech?</h2>
+            <h2 className="text-4xl font-bold text-white mb-4">Why Choose TimingoTech?</h2>
             <p className="text-xl text-blue-200">Trusted by organizations worldwide</p>
           </div>
           
@@ -489,7 +489,7 @@ const sendEmail = async (e) => {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a 
-              href="mailto:timingotech@gmail.com"
+              href="mailto:team@timingotech.com"
               className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 flex items-center justify-center gap-2"
             >
               <Mail className="w-5 h-5" />

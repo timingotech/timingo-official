@@ -20,12 +20,17 @@ const Support = () => {
   }, []);
 
   const initializePayment = () => {
-    const paystackPublicKey = 'pk_test_a7190862b89d8656b52a586c50ee3d5e89488fdf';
+    const paystackPublicKey = process.env.REACT_APP_PAYSTACK_PUBLIC_KEY;
+
+    if (!paystackPublicKey) {
+      console.error('Paystack is not configured for production.');
+      return;
+    }
 
     if (window.PaystackPop && paystackLoaded) {
       const paymentHandler = window.PaystackPop.setup({
         key: paystackPublicKey,
-        email: 'timingotech@gmail.com',
+        email: 'team@timingotech.com',
         amount: amount * 100,
         currency: 'NGN',
         ref: `${Math.floor(Math.random() * 1000000000)}`,
@@ -47,14 +52,17 @@ const Support = () => {
   return (
     <div className='bg-[#F7F7FA]'>
       <Helmet>
-        <title>Support Us - Timingotech | Make a Donation</title>
-        <meta name="description" content="Support Timingotech's community initiatives and technological innovation. Your donation helps us continue building solutions that make a difference." />
-        <meta name="keywords" content="support Timingotech, donate, community support, technology innovation" />
+        <title>Support Us - TimingoTech | Make a Donation</title>
+        <meta name="description" content="Support TimingoTech's community initiatives and technological innovation. Your donation helps us continue building solutions that make a difference." />
+        <meta name="keywords" content="support TimingoTech, donate, community support, technology innovation" />
         <link rel="canonical" href="https://www.timingotech.com/support" />
       </Helmet>
       <div className="container p-8 mx-auto">
         <div className="mb-8 ">
           <h2 className="mb-4 text-2xl font-bold text-center hometext-gradient">Make a Donation and Support Our Community</h2>
+          <p className="max-w-2xl mx-auto mb-4 text-sm text-center text-gray-600">
+            This donation page is not production-ready until a verified Paystack public key, receipt handling, and payment verification are configured.
+          </p>
           <p className="mb-4 text-lg text-center">Enter your donation amount:</p>
           <div className='md:ml-96'>
             <input

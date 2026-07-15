@@ -30,9 +30,9 @@ const Navbar = () => {
   };
 
   const services = [
-    { name: 'AI & Machine Learning', icon: <Code className="w-4 h-4" />, desc: 'Advanced AI solutions' },
-    { name: 'Mobile Development', icon: <Rocket className="w-4 h-4" />, desc: 'Native & cross-platform apps' },
-    { name: 'Web Development', icon: <Users className="w-4 h-4" />, desc: 'Modern web applications' },
+    { name: 'AI & Machine Learning', href: '/services#ai-ml', icon: <Code className="w-4 h-4" />, desc: 'Advanced AI solutions' },
+    { name: 'Mobile Development', href: '/services#mobile-dev', icon: <Rocket className="w-4 h-4" />, desc: 'Native & cross-platform apps' },
+    { name: 'Web Development', href: '/services#web-development', icon: <Users className="w-4 h-4" />, desc: 'Modern web applications' },
   ];
 
   return (
@@ -46,7 +46,7 @@ const Navbar = () => {
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link to="/" className="flex items-center space-x-2" onClick={closeMenu}>
-              <img src={TimingoTechlogo} alt="Timingotech Logo" className='w-32 md:ml-0 -ml-6' />
+              <img src={TimingoTechlogo} alt="TimingoTech Logo" className='w-32 md:ml-0 -ml-6' />
             </Link>
           </div>
 
@@ -80,7 +80,7 @@ const Navbar = () => {
                     {services.map((service, index) => (
                       <Link
                         key={index}
-                        to="/services"
+                        to={service.href}
                         className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
                         onClick={closeMenu}
                       >
@@ -106,7 +106,7 @@ const Navbar = () => {
               to="/timingoflow"
               className={`font-medium transition-colors hover:text-purple-600 ${scrolled ? 'text-purple-600' : 'text-white'}`}
             >
-              TimingoFlow ✨
+              TimingoFlow
             </Link>
             <Link
               to="/jobs"
@@ -179,7 +179,7 @@ const Navbar = () => {
               {services.map((service, index) => (
                 <Link
                   key={index}
-                  to="/services"
+                  to={service.href}
                   onClick={closeMenu}
                   className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
                 >
@@ -197,7 +197,7 @@ const Navbar = () => {
             Projects
           </Link>
           <Link to="/timingoflow" onClick={closeMenu} className="block text-lg font-medium text-purple-600 hover:text-purple-700 transition-colors">
-            TimingoFlow ✨
+            TimingoFlow
           </Link>
           <Link to="/jobs" onClick={closeMenu} className="block text-lg font-medium text-gray-700 hover:text-blue-600 transition-colors">
             Jobs

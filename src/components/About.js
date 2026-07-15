@@ -64,7 +64,7 @@ const About = () => {
     {
       year: "2021",
       title: "Company Founded",
-      description: "Timingotech was established with a vision to solve global challenges through innovative AI solutions."
+      description: "TimingoTech was established with a vision to solve global challenges through innovative AI solutions."
     },
     {
       year: "2024",
@@ -91,9 +91,9 @@ const About = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
       <Helmet>
-        <title>About Us - Timingotech | Our Story & Mission</title>
-        <meta name="description" content="Learn about Timingotech's mission to innovate with precision timing and AI. Discover our journey, values, and the team driving technological innovation across industries." />
-        <meta name="keywords" content="about Timingotech, our mission, company values, AI innovation, technology team" />
+        <title>About Us - TimingoTech | Our Story & Mission</title>
+        <meta name="description" content="Learn about TimingoTech's mission to build AI-powered growth systems and custom software for service businesses." />
+        <meta name="keywords" content="about TimingoTech, our mission, company values, AI innovation, technology team" />
         <link rel="canonical" href="https://www.timingotech.com/about" />
       </Helmet>
       <style jsx>{`
@@ -144,7 +144,7 @@ const About = () => {
         <div className="max-w-7xl mx-auto text-center">
           <div className={`animate-on-scroll ${animateOnLoad ? 'show' : ''}`}>
             <h1 className="text-5xl lg:text-6xl font-bold text-white mb-6">
-              About <span className="gradient-text">Timingotech</span>
+              About <span className="gradient-text">TimingoTech</span>
             </h1>
             <p className="text-xl text-white max-w-3xl mx-auto mb-8">
               We're a forward-thinking technology company dedicated to solving global challenges through innovative AI solutions, transforming industries and improving lives worldwide.

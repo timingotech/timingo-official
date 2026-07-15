@@ -1,4 +1,5 @@
 import { Resend } from 'resend';
+import { escapeHtml, nl2br, getMailConfig } from './_security.js';
 
 export default async function handler(req, res) {
   // Enable CORS
@@ -15,57 +16,61 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  console.log('Contact API called with body:', req.body);
+  if (!process.env.RESEND_API_KEY) {
+    return res.status(500).json({ error: 'Email service is not configured' });
+  }
 
-  const resend = new Resend('re_gbdZsVDi_LR6jmfCi3QBTXqWwbqrJi7kg');
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const { fromName, fromEmail, adminEmail } = getMailConfig();
 
   const { name, email, phone, company, service_interest, message } = req.body || {};
 
   if (!name || !email || !message) {
-    console.log('Missing required fields');
     return res.status(400).json({ error: 'Missing required fields: name, email, message' });
   }
 
-  console.log('Attempting to send contact emails for:', { name, email });
+  const safe = {
+    name: escapeHtml(name),
+    email: escapeHtml(email),
+    phone: escapeHtml(phone || 'N/A'),
+    company: escapeHtml(company || 'N/A'),
+    serviceInterest: escapeHtml(service_interest || 'N/A'),
+    message: nl2br(message),
+  };
 
   try {
     // Send to admin
     const adminEmail = await resend.emails.send({
-      from: 'TimingoTech Contact <team@timingotech.com>',
-      to: 'team@timingotech.com',
-      subject: `New contact from ${name} (${email})`,
+      from: `${fromName} Contact <${fromEmail}>`,
+      to: adminEmail,
+      subject: `New contact from ${safe.name} (${safe.email})`,
       html: `<h3>New contact submission</h3>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Phone:</strong> ${phone || 'N/A'}</p>
-        <p><strong>Company:</strong> ${company || 'N/A'}</p>
-        <p><strong>Service Interest:</strong> ${service_interest || 'N/A'}</p>
-        <p><strong>Message:</strong><br/>${message}</p>
+        <p><strong>Name:</strong> ${safe.name}</p>
+        <p><strong>Email:</strong> ${safe.email}</p>
+        <p><strong>Phone:</strong> ${safe.phone}</p>
+        <p><strong>Company:</strong> ${safe.company}</p>
+        <p><strong>Service Interest:</strong> ${safe.serviceInterest}</p>
+        <p><strong>Message:</strong><br/>${safe.message}</p>
       `,
     });
 
-    console.log('Admin email response:', JSON.stringify(adminEmail, null, 2));
-
     if (adminEmail.error) {
       console.error('Resend API error:', adminEmail.error);
-      return res.status(500).json({ 
-        error: 'Email service error', 
-        details: adminEmail.error
-      });
+      return res.status(500).json({ error: 'Email service error' });
     }
 
     // Send auto-reply to user
     try {
       const userEmail = await resend.emails.send({
-        from: 'TimingoTech <team@timingotech.com>',
+        from: `${fromName} <${fromEmail}>`,
         to: email,
-        subject: 'Thanks for contacting TimingoTech',
-        html: `<p>Hi ${name},</p>
+        subject: `Thanks for contacting ${fromName}`,
+        html: `<p>Hi ${safe.name},</p>
           <p>Thanks for reaching out. We'll review your message and get back to you within 24 hours.</p>
-          <p>Best regards,<br/>TimingoTech Team</p>
+          <p>Best regards,<br/>${escapeHtml(fromName)} Team</p>
         `,
       });
-      console.log('User auto-reply sent:', userEmail);
+      console.log('User auto-reply sent:', userEmail?.id);
     } catch (replyErr) {
       console.error('Auto-reply error:', replyErr);
     }
@@ -73,6 +78,6 @@ export default async function handler(req, res) {
     return res.status(200).json({ ok: true, emailId: adminEmail.id });
   } catch (err) {
     console.error('Contact email error:', err);
-    return res.status(500).json({ error: 'Failed to send email', details: err.message || String(err) });
+    return res.status(500).json({ error: 'Failed to send email' });
   }
 }

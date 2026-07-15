@@ -32,7 +32,7 @@ const Services = () => {
   };
 
   const handleEmailClick = () => {
-    window.location.href = 'mailto:hello@timingotech.com';
+    window.location.href = 'mailto:team@timingotech.com';
   };
 
   const handlePhoneClick = () => {
@@ -218,7 +218,7 @@ const Services = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
       <Helmet>
-        <title>Our Services - Timingotech | AI, Web, Mobile & Cloud Solutions</title>
+        <title>Our Services - TimingoTech | AI, Web, Mobile & Cloud Solutions</title>
         <meta name="description" content="Expert technology services including AI & Machine Learning, Web Development, Mobile Apps, Cloud Solutions, Cybersecurity, and Database Management. Custom solutions for your business needs." />
         <meta name="keywords" content="AI services, machine learning, web development services, mobile app development, cloud solutions, cybersecurity, database management" />
         <link rel="canonical" href="https://www.timingotech.com/services" />
@@ -299,6 +299,7 @@ const Services = () => {
             {services.map((service, index) => (
               <div 
                 key={service.id} 
+                id={service.id}
                 className="service-card bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
@@ -533,7 +534,7 @@ const Services = () => {
               className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 flex items-center justify-center gap-2"
             >
               <Mail className="w-5 h-5" />
-              hello@timingotech.com
+              team@timingotech.com
             </button>
             
             <button

@@ -24,7 +24,7 @@ const Project = () => {
   }, []);
 
   const handleEmailClick = () => {
-    window.location.href = 'mailto:timingotech@gmail.com';
+    window.location.href = 'mailto:team@timingotech.com';
   };
 
   const projects = [
@@ -51,9 +51,9 @@ const Project = () => {
       website: 'https://serenimind.onrender.com',
       status: 'Live',
       achievements: [
-        'Featured in Mental Health Innovation Awards 2024',
-        '95% user satisfaction rate',
-        'Reduced anxiety levels by 40% in clinical trials'
+        'Mental wellness product experience',
+        'AI-assisted support workflows',
+        'Community and mood-tracking features'
       ]
     },
     {
@@ -76,12 +76,12 @@ const Project = () => {
         efficiency: '+35%'
       },
       technologies: ['Vue.js', 'Django', 'PostgreSQL', 'Redis', 'AWS'],
-      website: 'https://vitaskr-website.com',
+      website: '',
       status: 'Live',
       achievements: [
-        'Adopted by Fortune 500 companies',
-        '35% improvement in employee productivity',
-        'Winner of Corporate Wellness Tech Award 2024'
+        'Corporate wellness and productivity concept',
+        'Task management with wellbeing workflows',
+        'Designed for teams balancing output and care'
       ]
     },
     {
@@ -104,12 +104,12 @@ const Project = () => {
         water: '-30%'
       },
       technologies: ['React Native', 'IoT', 'Machine Learning', 'Azure', 'Python'],
-      website: 'https://agritos-platform.com',
+      website: '',
       status: 'Beta',
       achievements: [
-        'Sustainable Farming Innovation Award 2024',
-        '45% increase in crop yield',
-        '30% reduction in water usage'
+        'Sustainable agriculture concept',
+        'AI-assisted crop monitoring direction',
+        'Resource optimization workflow design'
       ]
     }
   ];
@@ -117,9 +117,9 @@ const Project = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
       <Helmet>
-        <title>Our Projects - Timingotech | Success Stories & Case Studies</title>
-        <meta name="description" content="Explore Timingotech's portfolio of successful projects including SereniMind, Agritos, MediaFlow, and more. See how we transform businesses with innovative technology solutions." />
-        <meta name="keywords" content="Timingotech projects, case studies, portfolio, technology solutions, AI projects, web development projects" />
+        <title>Our Projects - TimingoTech | Success Stories & Case Studies</title>
+        <meta name="description" content="Explore TimingoTech proof points and selected projects, including SereniMind and TROF." />
+        <meta name="keywords" content="TimingoTech projects, case studies, portfolio, technology solutions, AI projects, web development projects" />
         <link rel="canonical" href="https://www.timingotech.com/projects" />
       </Helmet>
       <style jsx>{`
@@ -289,16 +289,18 @@ const Project = () => {
 
                   {/* Action Buttons */}
                   <div className="flex flex-wrap gap-4">
-                    <a 
-                      href={project.website} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 flex items-center gap-2"
-                    >
-                      <Globe className="w-5 h-5" />
-                      Visit Website
-                      <ExternalLink className="w-4 h-4" />
-                    </a>
+                    {project.website && (
+                      <a 
+                        href={project.website} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 flex items-center gap-2"
+                      >
+                        <Globe className="w-5 h-5" />
+                        Visit Website
+                        <ExternalLink className="w-4 h-4" />
+                      </a>
+                    )}
                     <Link 
                       to={`/projects/${project.id}`}
                       className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:border-blue-600 hover:text-blue-600 transition-all duration-300 flex items-center gap-2"

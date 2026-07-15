@@ -12,7 +12,7 @@ If you're seeing **500 errors** on `/api/demo`, `/api/contact`, or `/api/subscri
 2. Click **Add New**
 3. Enter:
    - **Key:** `RESEND_API_KEY`
-   - **Value:** `re_JRn1Ku9c_65t4wYW4stBfhNKrjxGHksxb`
+   - **Value:** your newly rotated Resend API key
    - **Environments:** Check ALL (Production, Preview, Development)
 4. Click **Save**
 5. **REQUIRED:** Go to **Deployments** tab → Click **Redeploy** on latest deployment
@@ -57,7 +57,7 @@ All emails are sent to: **team@timingotech.com**
    - Import your GitHub repository
    - Add Environment Variable:
      - Key: `RESEND_API_KEY`
-     - Value: `re_JRn1Ku9c_65t4wYW4stBfhNKrjxGHksxb`
+     - Value: your newly rotated Resend API key
    - Deploy!
 
 4. **Verify Resend Domain:**
@@ -102,8 +102,8 @@ before, 10 minutes before, etc).
 
 It's gated by a basic login screen — **not real authentication**, just a
 soft barrier so it isn't open to the public. Both the login and password are
-the company name: `Timingo Tech` (case-insensitive). Don't put sensitive data
-behind it.
+the server-side `REMINDERS_AUTH_TOKEN`. Do not put sensitive data behind the
+old client-only gate; it has been replaced with a server-enforced shared secret.
 
 ### 1. Create the database (Supabase, free tier)
 1. Sign up at [supabase.com](https://supabase.com) and create a new project.
@@ -116,6 +116,7 @@ behind it.
 In your Vercel project settings → Environment Variables, add:
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_KEY`
+- `REMINDERS_AUTH_TOKEN` — a random secret required by `/api/reminders` and `/api/push-subscribe`. Use the same random generation approach as `CRON_SECRET`.
 - `CRON_SECRET` — any random string. Generate one locally with:
   ```bash
   node -e "console.log(require('crypto').randomBytes(24).toString('hex'))"

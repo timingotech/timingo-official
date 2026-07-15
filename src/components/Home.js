@@ -3,7 +3,6 @@ import axios from 'axios';
 import { Helmet } from 'react-helmet-async';
 import { ChevronRight, Users, Trophy, Lightbulb, Zap, Shield, Globe, ArrowRight, CheckCircle, Star, Smartphone, Cloud, Database, Brain, Rocket, Target, X, ExternalLink } from 'lucide-react';
 import {Link} from 'react-router-dom'
-import Microsoft from '../images/Microsoft.jpeg'
 import SereniMind from '../images/SereniMind.png'
 import Trof from '../images/Trof.png'
 
@@ -46,7 +45,7 @@ const Home = () => {
   // Testimonial rotation
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentTestimonial((prev) => (prev + 1) % 3);
+      setCurrentTestimonial((prev) => (prev + 1) % 2);
     }, 5000);
     return () => clearInterval(timer);
   }, []);
@@ -97,8 +96,7 @@ const Home = () => {
 
   const partners = [
     { name: 'SereniMind', logo: SereniMind },
-    { name: 'TROF', logo: Trof },
-    { name: 'Microsoft', logo: Microsoft }
+    { name: 'TROF', logo: Trof }
   ];
 
   const services = [
@@ -155,7 +153,7 @@ const Home = () => {
       metrics: [
         '1,000+ children supported',
         '25+ communities reached',
-        '500+ testimonials from grateful families'
+        'Community-centered impact reporting'
       ],
       tech: ['React', 'Node JS', 'Vercel'],
       website: 'https://trof.vercel.app',
@@ -176,21 +174,14 @@ const Home = () => {
       name: 'Adebola Adeniyi',
       company: 'SereniMind',
       role: 'CTO',
-      content: 'TimingoTech transformed our digital infrastructure. Their AI solutions increased our efficiency by 40%.',
+      content: 'TimingoTech helped us move faster with a clearer technical foundation and practical AI workflows.',
       rating: 5
     },
     {
-      name: 'Michael Chen',
-      company: 'Global Media Ltd.',
-      role: 'CEO',
-      content: 'The MediaFlow platform revolutionized how we handle content. Exceptional technical expertise.',
-      rating: 5
-    },
-    {
-      name: 'David Chibu',
-      company: 'FinanceFlow',
-      role: 'Product Director',
-      content: 'Outstanding mobile development. Our app now serves millions with perfect reliability.',
+      name: 'TROF Team',
+      company: 'Raymond Ofodu Foundation',
+      role: 'Community Partner',
+      content: 'The team brought structure and care to a platform built for real community impact.',
       rating: 5
     }
   ];
@@ -225,9 +216,9 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       <Helmet>
-        <title>Timingotech - AI & Technology Solutions for Global Innovation</title>
+        <title>TimingoTech - AI Growth Systems & Custom Software for Service Businesses</title>
         <meta name="description" content="We innovate with precision timing and AI to solve global challenges across industries. Expert services in AI/ML, web development, mobile apps, cloud solutions, and cybersecurity." />
-        <meta name="keywords" content="AI solutions, machine learning, web development, technology consulting, Timingotech" />
+        <meta name="keywords" content="AI solutions, machine learning, web development, technology consulting, TimingoTech" />
         <link rel="canonical" href="https://www.timingotech.com/" />
       </Helmet>
       <style jsx>{`
@@ -317,7 +308,7 @@ const Home = () => {
                 <div className="relative bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20">
                   <div className="grid grid-cols-2 gap-6">
                     <div className="text-center">
-                      <div className="text-3xl font-bold text-white">500+</div>
+                      <div className="text-3xl font-bold text-white">Selected</div>
                       <div className="text-gray-300">Projects Delivered</div>
                     </div>
                     <div className="text-center">
@@ -325,8 +316,8 @@ const Home = () => {
                       <div className="text-gray-300">Client Satisfaction</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-3xl font-bold text-white">50+</div>
-                      <div className="text-gray-300">Team Experts</div>
+                      <div className="text-3xl font-bold text-white">Focused</div>
+                      <div className="text-gray-300">Technical Team</div>
                     </div>
                     <div className="text-center">
                       <div className="text-3xl font-bold text-white">24/7</div>
@@ -677,10 +668,17 @@ const Home = () => {
                 </div>
                 <button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300"
+                  disabled={isSubmitting}
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 disabled:opacity-60"
                 >
-                  Send Message
+                  {isSubmitting ? 'Sending...' : 'Send Message'}
                 </button>
+                {submitStatus === 'success' && (
+                  <p className="text-sm font-medium text-green-300">Message sent. We'll get back to you soon.</p>
+                )}
+                {submitStatus === 'error' && (
+                  <p className="text-sm font-medium text-red-300">Something went wrong. Please try again or email us directly.</p>
+                )}
               </div>
             </form>
 
@@ -698,18 +696,25 @@ const Home = () => {
                   />
                   <button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-300"
+                    disabled={isSubscribing}
+                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-300 disabled:opacity-60"
                   >
-                    Subscribe
+                    {isSubscribing ? 'Subscribing...' : 'Subscribe'}
                   </button>
+                  {subscribeStatus === 'success' && (
+                    <p className="text-sm font-medium text-green-300">Subscribed. Thank you.</p>
+                  )}
+                  {subscribeStatus === 'error' && (
+                    <p className="text-sm font-medium text-red-300">Subscription failed. Please try again.</p>
+                  )}
                 </div>
               </form>
 
               <div className="animate-on-scroll bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20">
                 <h3 className="text-2xl font-bold text-white mb-6">Contact Information</h3>
                 <div className="space-y-4 text-gray-300">
-                  <div>📧 timingotech@gmail.com</div>
-                  <div>📞 +234 (902) 201-3174</div>
+                  <div>Email: team@timingotech.com</div>
+                  <div>Phone: +234 (902) 201-3174</div>
                   <div> Mon-Sat: 9:00 AM - 6:00 PM</div>
                 </div>
               </div>

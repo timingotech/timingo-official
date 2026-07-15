@@ -16,7 +16,7 @@ const Footer = () => {
   const openModal = (name) => {
     setModalTitle(name);
     const emailLink = (
-      <a href="mailto:timingotech@gmail.com" className="text-blue-600 hover:underline">timingotech@gmail.com</a>
+      <a href="mailto:team@timingotech.com" className="text-blue-600 hover:underline">team@timingotech.com</a>
     );
 
     switch (name) {
@@ -92,21 +92,12 @@ const Footer = () => {
   ];
 
   const company = [
-    { name: 'About Us', href: '/about' },
-    { name: 'Our Team', href: null },
-    { name: 'Careers', href: null },
-    { name: 'News & Updates', href: null },
-    { name: 'Privacy Policy', href: null },
-    { name: 'Terms of Service', href: null }
+    { name: 'About Us', href: '/about' }
   ];
 
   const resources = [
-    { name: 'Documentation', href: null },
-    { name: 'API Reference', href: null },
     { name: 'Support Center', href: '/support' },
-    { name: 'Case Studies', href: '/projects' },
-    { name: 'Whitepapers', href: null },
-    { name: 'Blog', href: null }
+    { name: 'Case Studies', href: '/projects' }
   ];
 
   return (
@@ -182,8 +173,8 @@ const Footer = () => {
                 </div>
                 <div>
                   <div className="text-sm text-gray-400">Email</div>
-                  <a href="mailto:hello@timingotech.com" className="text-white hover:text-blue-400 transition-colors">
-                    timingotech@gmail.com
+                  <a href="mailto:team@timingotech.com" className="text-white hover:text-blue-400 transition-colors">
+                    team@timingotech.com
                   </a>
                 </div>
               </div>

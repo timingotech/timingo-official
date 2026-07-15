@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 import webpush from 'web-push';
+import { escapeHtml, nl2br } from './_security.js';
 
 if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
   webpush.setVapidDetails(
@@ -111,25 +112,30 @@ function describeOffset(offsetMinutes) {
 function buildEmailHtml({ reminder, name, dueLabel, offsetMinutes }) {
   const when        = describeOffset(offsetMinutes);
   const accentColor = offsetMinutes === 0 ? '#e53e3e' : '#F7666F';
+  const safeTitle = escapeHtml(reminder.title);
+  const safeCompany = escapeHtml(reminder.company);
+  const safeCategory = escapeHtml(reminder.category || '');
+  const safeName = escapeHtml(name);
+  const safeUrl = escapeHtml(reminder.url || '');
   const badgeText   = offsetMinutes === 0 ? '⚡ Due Right Now' : `⏰ Due ${when}`;
 
   const messageHtml = reminder.custom_email_body
-    ? `<p style="margin:0 0 16px;color:#374151;line-height:1.6;">${String(reminder.custom_email_body).replace(/\n/g, '<br/>')}</p>`
-    : `<p style="margin:0 0 16px;color:#374151;line-height:1.6;">This is your reminder for <strong style="color:#111827;">${reminder.company}</strong>${offsetMinutes === 0 ? ' — it\'s due <strong>right now</strong>' : `, due <strong>${when}</strong>`}.</p>`;
+    ? `<p style="margin:0 0 16px;color:#374151;line-height:1.6;">${nl2br(reminder.custom_email_body)}</p>`
+    : `<p style="margin:0 0 16px;color:#374151;line-height:1.6;">This is your reminder for <strong style="color:#111827;">${safeCompany}</strong>${offsetMinutes === 0 ? ' - it is due <strong>right now</strong>' : `, due <strong>${when}</strong>`}.</p>`;
 
   const notesHtml = reminder.notes
     ? `<div style="margin:16px 0;padding:14px 16px;background:#F9FAFB;border-left:3px solid #D1D5DB;border-radius:4px;">
-        <p style="margin:0;font-size:13px;color:#6B7280;line-height:1.6;">${reminder.notes.replace(/\n/g, '<br/>')}</p>
+        <p style="margin:0;font-size:13px;color:#6B7280;line-height:1.6;">${nl2br(reminder.notes)}</p>
        </div>`
     : '';
 
   const urlHtml = reminder.url
-    ? `<p style="margin:12px 0 0;"><a href="${reminder.url}" style="color:#6675F7;font-size:13px;text-decoration:none;">🔗 View reference link →</a></p>`
+    ? `<p style="margin:12px 0 0;"><a href="${safeUrl}" style="color:#6675F7;font-size:13px;text-decoration:none;">View reference link</a></p>`
     : '';
 
   return `<!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>${reminder.title}</title></head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>${safeTitle}</title></head>
 <body style="margin:0;padding:0;background:#F3F4F6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#F3F4F6;padding:32px 16px;">
     <tr><td align="center">
@@ -137,14 +143,14 @@ function buildEmailHtml({ reminder, name, dueLabel, offsetMinutes }) {
 
         <tr><td style="background:linear-gradient(135deg,#F7666F,#6675F7);border-radius:12px 12px 0 0;padding:24px 32px;">
           <p style="margin:0;font-size:13px;font-weight:600;letter-spacing:0.05em;color:rgba(255,255,255,0.8);text-transform:uppercase;">Timingo Tech Reminders</p>
-          <p style="margin:6px 0 0;font-size:22px;font-weight:700;color:#ffffff;">${reminder.title}</p>
+          <p style="margin:6px 0 0;font-size:22px;font-weight:700;color:#ffffff;">${safeTitle}</p>
         </td></tr>
 
         <tr><td style="background:#ffffff;padding:28px 32px;border-left:1px solid #E5E7EB;border-right:1px solid #E5E7EB;">
           <p style="margin:0 0 20px;">
             <span style="display:inline-block;padding:6px 14px;background:${accentColor}18;color:${accentColor};font-size:13px;font-weight:600;border-radius:20px;border:1px solid ${accentColor}33;">${badgeText}</span>
           </p>
-          <p style="margin:0 0 4px;font-size:15px;color:#111827;">Hi <strong>${name}</strong>,</p>
+          <p style="margin:0 0 4px;font-size:15px;color:#111827;">Hi <strong>${safeName}</strong>,</p>
           <div style="margin:16px 0;">${messageHtml}${notesHtml}</div>
           <table width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;">
             <tr><td style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;padding:14px 18px;">
@@ -156,12 +162,12 @@ function buildEmailHtml({ reminder, name, dueLabel, offsetMinutes }) {
             <tr>
               <td width="50%" style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;padding:12px 16px;">
                 <p style="margin:0 0 2px;font-size:11px;font-weight:600;letter-spacing:0.06em;color:#9CA3AF;text-transform:uppercase;">Company</p>
-                <p style="margin:0;font-size:14px;font-weight:600;color:#111827;">${reminder.company}</p>
+                <p style="margin:0;font-size:14px;font-weight:600;color:#111827;">${safeCompany}</p>
               </td>
               ${reminder.category ? `<td width="4px"></td>
               <td style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;padding:12px 16px;">
                 <p style="margin:0 0 2px;font-size:11px;font-weight:600;letter-spacing:0.06em;color:#9CA3AF;text-transform:uppercase;">Category</p>
-                <p style="margin:0;font-size:14px;font-weight:600;color:#111827;">${reminder.category}</p>
+                <p style="margin:0;font-size:14px;font-weight:600;color:#111827;">${safeCategory}</p>
               </td>` : ''}
             </tr>
           </table>

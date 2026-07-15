@@ -297,13 +297,13 @@ const TimingoFlow = () => {
         <div className="max-w-6xl mx-auto px-6 relative z-10">
           <div className={`text-center space-y-8 ${animateOnLoad ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} transition-all duration-1000`}>
             <div className="inline-block px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-medium mb-4">
-              By Timingotech
+              By TimingoTech
             </div>
             <h1 className="text-5xl md:text-7xl font-bold text-white leading-tight">
-              Get 10–30 Qualified Client Opportunities<br />Every Month Without Cold Outreach
+              Get 10-30 Qualified Client Opportunities<br />Every Month With Smarter Outreach
             </h1>
             <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto leading-relaxed">
-              We find, contact, and convert businesses already needing your service — so you don't have to chase leads.
+              We find, contact, and convert businesses already needing your service, so you do not have to chase leads manually.
             </p>
             <p className="text-lg text-white/80 max-w-2xl mx-auto pt-2">
               Built for agencies looking to grow consistently without increasing workload.
@@ -928,7 +928,7 @@ const TimingoFlow = () => {
 
             <div className="pt-8 border-t border-gray-200">
               <p className="text-gray-600">
-                A product by <span className="font-semibold text-purple-600">Timingotech</span> — systems that get you clients, not complexity.
+                A product by <span className="font-semibold text-purple-600">TimingoTech</span> — systems that get you clients, not complexity.
               </p>
             </div>
           </div>

@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
+import { escapeHtml, nl2br, requireSharedSecret } from './_security.js';
 
 function getClient() {
   return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
@@ -7,6 +8,11 @@ function getClient() {
 
 function buildEmailHtml({ reminder, name, dueLabel, isCreated = false, offsetMinutes = null }) {
   const when = offsetMinutes === null ? null : describeOffset(offsetMinutes);
+  const safeTitle = escapeHtml(reminder.title);
+  const safeCompany = escapeHtml(reminder.company);
+  const safeCategory = escapeHtml(reminder.category || '');
+  const safeName = escapeHtml(name);
+  const safeUrl = escapeHtml(reminder.url || '');
 
   const accentColor  = offsetMinutes === 0 ? '#e53e3e' : isCreated ? '#6675F7' : '#F7666F';
   const badgeText    = isCreated
@@ -16,24 +22,24 @@ function buildEmailHtml({ reminder, name, dueLabel, isCreated = false, offsetMin
     : `⏰ Due ${when}`;
 
   const messageHtml = reminder.custom_email_body
-    ? `<p style="margin:0 0 16px;color:#374151;line-height:1.6;">${String(reminder.custom_email_body).replace(/\n/g, '<br/>')}</p>`
+    ? `<p style="margin:0 0 16px;color:#374151;line-height:1.6;">${nl2br(reminder.custom_email_body)}</p>`
     : isCreated
-    ? `<p style="margin:0 0 16px;color:#374151;line-height:1.6;">A reminder has been set for <strong style="color:#111827;">${reminder.company}</strong>. You'll receive follow-up nudges by email as the due time approaches.</p>`
-    : `<p style="margin:0 0 16px;color:#374151;line-height:1.6;">This is your reminder for <strong style="color:#111827;">${reminder.company}</strong>${offsetMinutes === 0 ? ' — due <strong>right now</strong>' : `, due <strong>${when}</strong>`}.</p>`;
+    ? `<p style="margin:0 0 16px;color:#374151;line-height:1.6;">A reminder has been set for <strong style="color:#111827;">${safeCompany}</strong>. You'll receive follow-up nudges by email as the due time approaches.</p>`
+    : `<p style="margin:0 0 16px;color:#374151;line-height:1.6;">This is your reminder for <strong style="color:#111827;">${safeCompany}</strong>${offsetMinutes === 0 ? ' - due <strong>right now</strong>' : `, due <strong>${when}</strong>`}.</p>`;
 
   const notesHtml = reminder.notes
     ? `<div style="margin:16px 0;padding:14px 16px;background:#F9FAFB;border-left:3px solid #D1D5DB;border-radius:4px;">
-        <p style="margin:0;font-size:13px;color:#6B7280;line-height:1.6;">${reminder.notes.replace(/\n/g, '<br/>')}</p>
+        <p style="margin:0;font-size:13px;color:#6B7280;line-height:1.6;">${nl2br(reminder.notes)}</p>
        </div>`
     : '';
 
   const urlHtml = reminder.url
-    ? `<p style="margin:12px 0 0;"><a href="${reminder.url}" style="color:#6675F7;font-size:13px;text-decoration:none;">🔗 View reference link →</a></p>`
+    ? `<p style="margin:12px 0 0;"><a href="${safeUrl}" style="color:#6675F7;font-size:13px;text-decoration:none;">View reference link</a></p>`
     : '';
 
   return `<!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>${reminder.title}</title></head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>${safeTitle}</title></head>
 <body style="margin:0;padding:0;background:#F3F4F6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#F3F4F6;padding:32px 16px;">
     <tr><td align="center">
@@ -42,7 +48,7 @@ function buildEmailHtml({ reminder, name, dueLabel, isCreated = false, offsetMin
         <!-- header bar -->
         <tr><td style="background:linear-gradient(135deg,#F7666F,#6675F7);border-radius:12px 12px 0 0;padding:24px 32px;">
           <p style="margin:0;font-size:13px;font-weight:600;letter-spacing:0.05em;color:rgba(255,255,255,0.8);text-transform:uppercase;">Timingo Tech Reminders</p>
-          <p style="margin:6px 0 0;font-size:22px;font-weight:700;color:#ffffff;">${reminder.title}</p>
+          <p style="margin:6px 0 0;font-size:22px;font-weight:700;color:#ffffff;">${safeTitle}</p>
         </td></tr>
 
         <!-- body card -->
@@ -53,7 +59,7 @@ function buildEmailHtml({ reminder, name, dueLabel, isCreated = false, offsetMin
             <span style="display:inline-block;padding:6px 14px;background:${accentColor}18;color:${accentColor};font-size:13px;font-weight:600;border-radius:20px;border:1px solid ${accentColor}33;">${badgeText}</span>
           </p>
 
-          <p style="margin:0 0 4px;font-size:15px;color:#111827;">Hi <strong>${name}</strong>,</p>
+          <p style="margin:0 0 4px;font-size:15px;color:#111827;">Hi <strong>${safeName}</strong>,</p>
 
           <div style="margin:16px 0;">
             ${messageHtml}
@@ -75,13 +81,13 @@ function buildEmailHtml({ reminder, name, dueLabel, isCreated = false, offsetMin
             <tr>
               <td width="50%" style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;padding:12px 16px;">
                 <p style="margin:0 0 2px;font-size:11px;font-weight:600;letter-spacing:0.06em;color:#9CA3AF;text-transform:uppercase;">Company</p>
-                <p style="margin:0;font-size:14px;font-weight:600;color:#111827;">${reminder.company}</p>
+                <p style="margin:0;font-size:14px;font-weight:600;color:#111827;">${safeCompany}</p>
               </td>
               ${reminder.category ? `
               <td width="4px"></td>
               <td style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;padding:12px 16px;">
                 <p style="margin:0 0 2px;font-size:11px;font-weight:600;letter-spacing:0.06em;color:#9CA3AF;text-transform:uppercase;">Category</p>
-                <p style="margin:0;font-size:14px;font-weight:600;color:#111827;">${reminder.category}</p>
+                <p style="margin:0;font-size:14px;font-weight:600;color:#111827;">${safeCategory}</p>
               </td>` : ''}
             </tr>
           </table>
@@ -169,10 +175,14 @@ const UPDATABLE_FIELDS = [
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Reminders-Auth, X-Internal-Auth');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
+  }
+
+  if (!requireSharedSecret(req, res)) {
+    return;
   }
 
   if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
