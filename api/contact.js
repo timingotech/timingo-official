@@ -21,7 +21,7 @@ export default async function handler(req, res) {
   }
 
   const resend = new Resend(process.env.RESEND_API_KEY);
-  const { fromName, fromEmail, adminEmail } = getMailConfig();
+  const { fromName, fromEmail, adminEmail: contactRecipient } = getMailConfig();
 
   const { name, email, phone, company, service_interest, message } = req.body || {};
 
@@ -40,9 +40,10 @@ export default async function handler(req, res) {
 
   try {
     // Send to admin
-    const adminEmail = await resend.emails.send({
+    const adminResult = await resend.emails.send({
       from: `${fromName} Contact <${fromEmail}>`,
-      to: adminEmail,
+      to: contactRecipient,
+      reply_to: email,
       subject: `New contact from ${safe.name} (${safe.email})`,
       html: `<h3>New contact submission</h3>
         <p><strong>Name:</strong> ${safe.name}</p>
@@ -54,8 +55,8 @@ export default async function handler(req, res) {
       `,
     });
 
-    if (adminEmail.error) {
-      console.error('Resend API error:', adminEmail.error);
+    if (adminResult.error) {
+      console.error('Resend API error:', adminResult.error);
       return res.status(500).json({ error: 'Email service error' });
     }
 
@@ -64,6 +65,7 @@ export default async function handler(req, res) {
       const userEmail = await resend.emails.send({
         from: `${fromName} <${fromEmail}>`,
         to: email,
+        reply_to: contactRecipient,
         subject: `Thanks for contacting ${fromName}`,
         html: `<p>Hi ${safe.name},</p>
           <p>Thanks for reaching out. We'll review your message and get back to you within 24 hours.</p>
@@ -75,7 +77,7 @@ export default async function handler(req, res) {
       console.error('Auto-reply error:', replyErr);
     }
 
-    return res.status(200).json({ ok: true, emailId: adminEmail.id });
+    return res.status(200).json({ ok: true, emailId: adminResult.id });
   } catch (err) {
     console.error('Contact email error:', err);
     return res.status(500).json({ error: 'Failed to send email' });

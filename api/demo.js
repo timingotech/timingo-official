@@ -37,6 +37,7 @@ export default async function handler(req, res) {
     const adminResult = await resend.emails.send({
       from: `TimingoFlow <${fromEmail}>`,
       to: adminEmail,
+      reply_to: email,
       subject: `New TimingoFlow demo request from ${safe.name}`,
       html: `<h3>New TimingoFlow Demo Booking</h3>
         <p><strong>Name:</strong> ${safe.name}</p>
@@ -57,6 +58,7 @@ export default async function handler(req, res) {
       const userEmail = await resend.emails.send({
         from: `TimingoFlow <${fromEmail}>`,
         to: email,
+        reply_to: adminEmail,
         subject: 'Your TimingoFlow demo request',
         html: `<p>Hi ${safe.name},</p>
           <p>Thanks for your interest in TimingoFlow. We've received your demo request and will get back to you within 24 hours to schedule your 10-minute demo.</p>
