@@ -111,6 +111,35 @@ const Project = () => {
         'AI-assisted crop monitoring direction',
         'Resource optimization workflow design'
       ]
+    },
+    {
+      id: 'complicheck',
+      title: 'CompliCheck',
+      category: 'GovTech & Contract Operations',
+      tagline: 'Post-Award Contract Execution & Oversight',
+      description: 'A structured, auditable workspace connecting contract records, milestones, evidence, reviews and decisions.',
+      image: 'CC',
+      bgGradient: 'from-slate-900 to-blue-700',
+      features: [
+        'Controlled post-award contract records and document history',
+        'Milestone, inspection and completion evidence tracking',
+        'Role-based review, query and approval workflows',
+        'Structured event, extension and variation records'
+      ],
+      metrics: {
+        scope: 'Post-award',
+        history: 'Auditable',
+        access: 'Role-based'
+      },
+      technologies: ['Workflow Automation', 'Document Control', 'Oversight Analytics', 'Audit Trails'],
+      website: '',
+      detailPath: '/complicheck',
+      status: 'Platform',
+      achievements: [
+        'Creates one connected contract execution record',
+        'Preserves existing institutional authority',
+        'Supports continuity across teams and administrations'
+      ]
     }
   ];
 
@@ -302,10 +331,10 @@ const Project = () => {
                       </a>
                     )}
                     <Link 
-                      to={`/projects/${project.id}`}
+                      to={project.detailPath || `/projects/${project.id}`}
                       className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:border-blue-600 hover:text-blue-600 transition-all duration-300 flex items-center gap-2"
                     >
-                      View Case Study
+                      {project.detailPath ? 'Explore Product' : 'View Case Study'}
                       <ArrowRight className="w-4 h-4" />
                     </Link>
                   </div>

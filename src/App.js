@@ -13,6 +13,7 @@ import ProjectDetail from './components/ProjectDetail';
 import TimingoFlow from './components/TimingoFlow';
 import JobFinder from './components/JobFinder';
 import Reminders from './components/Reminders';
+import CompliCheck from './components/CompliCheck';
 import NotFound from './components/NotFound';
 
 
@@ -33,6 +34,7 @@ function App() {
          <Route path='/projects' element={<Project/>}/>
          <Route path='/projects/:id' element={<ProjectDetail/>} />
          <Route path='/timingoflow' element={<TimingoFlow/>} />
+         <Route path='/complicheck' element={<CompliCheck/>} />
          <Route path='/jobs' element={<JobFinder/>} />
          <Route path='/reminders' element={<Reminders/>} />
         <Route path='*' element={<NotFound/>} />

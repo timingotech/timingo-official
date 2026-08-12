@@ -95,6 +95,11 @@ const Footer = () => {
     { name: 'About Us', href: '/about' }
   ];
 
+  const products = [
+    { name: 'CompliCheck', href: '/complicheck' },
+    { name: 'TimingoFlow', href: '/timingoflow' }
+  ];
+
   const resources = [
     { name: 'Support Center', href: '/support' },
     { name: 'Case Studies', href: '/projects' }
@@ -148,7 +153,7 @@ const Footer = () => {
 
       {/* Main Footer Content */}
       <div className="max-w-7xl mx-auto px-6 py-16">
-        <div className="grid lg:grid-cols-5 md:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-6 md:grid-cols-3 gap-8">
           {/* Company Info */}
           <div className="lg:col-span-2">
             <div className="flex items-center space-x-3 mb-6">
@@ -215,6 +220,21 @@ const Footer = () => {
                       </Link>
                     </li>
                   ))}
+            </ul>
+          </div>
+
+          {/* Products */}
+          <div>
+            <h4 className="text-lg font-semibold mb-6">Products</h4>
+            <ul className="space-y-3">
+              {products.map((product) => (
+                <li key={product.name}>
+                  <Link to={product.href} className="text-gray-400 hover:text-white transition-colors flex items-center group">
+                    <ArrowRight className="w-4 h-4 mr-2 opacity-0 group-hover:opacity-100 transform -translate-x-2 group-hover:translate-x-0 transition-all" />
+                    {product.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 

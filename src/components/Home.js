@@ -166,6 +166,23 @@ const Home = () => {
         'Community outreach programs',
         'Climate action initiatives tracking'
       ]
+    },
+    {
+      title: 'CompliCheck',
+      category: 'Contract Execution & Oversight',
+      achievement: 'Post-award clarity',
+      description: 'A structured workspace for contract milestones, evidence, reviews, decisions, and audit-ready history.',
+      metrics: ['One controlled record', 'Role-based workflows', 'End-to-end audit trail'],
+      tech: ['Workflow Automation', 'Document Control', 'Oversight Analytics'],
+      website: '',
+      detailPath: '/complicheck',
+      fullDescription: 'CompliCheck helps institutions and delivery partners coordinate the post-award contract journey in one structured, auditable environment.',
+      features: [
+        'Controlled contract and milestone records',
+        'Document submission and evidence tracking',
+        'Inspection and approval routing',
+        'Extensions, variations, completion, and handover history'
+      ]
     }
   ];
 
@@ -367,7 +384,7 @@ const Home = () => {
               Showcase of our successful implementations across various industries
             </p>
           </div>
-          <div className="grid lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-8">
             {projects.map((project, index) => (
               <div key={index} className="animate-on-scroll card-hover bg-white rounded-xl shadow-lg overflow-hidden">
                 <div className="p-8">
@@ -397,12 +414,21 @@ const Home = () => {
                     ))}
                   </div>
                   
-                  <button 
-                    onClick={() => openProjectModal(project)}
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all"
-                  >
-                    View Case Study
-                  </button>
+                  {project.detailPath ? (
+                    <Link
+                      to={project.detailPath}
+                      className="block w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg text-center font-semibold hover:from-blue-700 hover:to-purple-700 transition-all"
+                    >
+                      Explore Product
+                    </Link>
+                  ) : (
+                    <button
+                      onClick={() => openProjectModal(project)}
+                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all"
+                    >
+                      View Case Study
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
@@ -472,14 +498,16 @@ const Home = () => {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
-                <a
-                  href={selectedProject.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 flex items-center justify-center gap-2"
-                >
-                  Visit Website <ExternalLink className="w-5 h-5" />
-                </a>
+                {selectedProject.website && (
+                  <a
+                    href={selectedProject.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 flex items-center justify-center gap-2"
+                  >
+                    Visit Website <ExternalLink className="w-5 h-5" />
+                  </a>
+                )}
                 <button
                   onClick={closeProjectModal}
                   className="flex-1 border-2 border-gray-300 text-gray-700 py-3 px-6 rounded-lg font-semibold hover:bg-gray-50 transition-all duration-300"

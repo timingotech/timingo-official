@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Menu, X, ChevronDown, Code, Rocket, Users } from 'lucide-react';
+import { Menu, X, ChevronDown, Code, Rocket, Users, ShieldCheck, Workflow } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import TimingoTechlogo from '../images/TimingoTech.png';
 const Navbar = () => {
   const [showMenu, setShowMenu] = useState(false);
   const [showServices, setShowServices] = useState(false);
+  const [showProducts, setShowProducts] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -23,16 +24,26 @@ const Navbar = () => {
   const closeMenu = () => {
     setShowMenu(false);
     setShowServices(false);
+    setShowProducts(false);
   };
 
   const toggleServices = () => {
     setShowServices(!showServices);
   };
 
+  const toggleProducts = () => {
+    setShowProducts(!showProducts);
+  };
+
   const services = [
     { name: 'AI & Machine Learning', href: '/services#ai-ml', icon: <Code className="w-4 h-4" />, desc: 'Advanced AI solutions' },
     { name: 'Mobile Development', href: '/services#mobile-dev', icon: <Rocket className="w-4 h-4" />, desc: 'Native & cross-platform apps' },
     { name: 'Web Development', href: '/services#web-development', icon: <Users className="w-4 h-4" />, desc: 'Modern web applications' },
+  ];
+
+  const products = [
+    { name: 'CompliCheck', href: '/complicheck', icon: <ShieldCheck className="w-4 h-4" />, desc: 'Contract execution & oversight' },
+    { name: 'TimingoFlow', href: '/timingoflow', icon: <Workflow className="w-4 h-4" />, desc: 'AI-powered growth system' },
   ];
 
   return (
@@ -96,17 +107,42 @@ const Navbar = () => {
               </div>
             </div>
 
+            {/* Products Dropdown */}
+            <div className="relative group">
+              <button
+                className={`flex items-center space-x-1 font-medium transition-colors hover:text-cyan-500 ${scrolled ? 'text-gray-700' : 'text-white'}`}
+                onClick={toggleProducts}
+              >
+                <span>Products</span>
+                <ChevronDown className="w-4 h-4 transition-transform group-hover:rotate-180" />
+              </button>
+              <div className="absolute top-full left-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+                <div className="p-6">
+                  <div className="grid gap-4">
+                    {products.map((product) => (
+                      <Link
+                        key={product.name}
+                        to={product.href}
+                        className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                        onClick={closeMenu}
+                      >
+                        <div className="text-blue-600 mt-1">{product.icon}</div>
+                        <div>
+                          <div className="font-medium text-gray-900">{product.name}</div>
+                          <div className="text-sm text-gray-500">{product.desc}</div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <Link 
               to="/projects" 
               className={`font-medium transition-colors hover:text-blue-600 ${scrolled ? 'text-gray-700' : 'text-white'}`}
             >
               Projects
-            </Link>
-            <Link
-              to="/timingoflow"
-              className={`font-medium transition-colors hover:text-purple-600 ${scrolled ? 'text-purple-600' : 'text-white'}`}
-            >
-              TimingoFlow
             </Link>
             <Link
               to="/jobs"
@@ -193,11 +229,38 @@ const Navbar = () => {
             </div>
           </div>
 
+          {/* Mobile Products */}
+          <div>
+            <button
+              onClick={toggleProducts}
+              className="flex items-center justify-between w-full text-lg font-medium text-gray-700 hover:text-blue-600 transition-colors"
+            >
+              <span>Products</span>
+              <ChevronDown className={`w-5 h-5 transition-transform ${showProducts ? 'rotate-180' : ''}`} />
+            </button>
+
+            <div className={`mt-4 ml-4 space-y-3 transition-all duration-300 ${
+              showProducts ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
+            } overflow-hidden`}>
+              {products.map((product) => (
+                <Link
+                  key={product.name}
+                  to={product.href}
+                  onClick={closeMenu}
+                  className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <div className="text-blue-600">{product.icon}</div>
+                  <div>
+                    <div className="font-medium text-gray-900">{product.name}</div>
+                    <div className="text-sm text-gray-500">{product.desc}</div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+
          <Link to="/projects" onClick={closeMenu} className="block text-lg font-medium text-gray-700 hover:text-blue-600 transition-colors">
             Projects
-          </Link>
-          <Link to="/timingoflow" onClick={closeMenu} className="block text-lg font-medium text-purple-600 hover:text-purple-700 transition-colors">
-            TimingoFlow
           </Link>
           <Link to="/jobs" onClick={closeMenu} className="block text-lg font-medium text-gray-700 hover:text-blue-600 transition-colors">
             Jobs
